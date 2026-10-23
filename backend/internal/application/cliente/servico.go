@@ -65,3 +65,4 @@ func (s *Servico) Situacao(id int) (domain.Situacao, error) {
 }
 
 func (s *Servico) IdadePermitida(idade int) bool { return domain.IdadePermitida(idade) }
+func (s *Servico) Listar() []*domain.Cliente     { return s.repositorio.Listar() }
