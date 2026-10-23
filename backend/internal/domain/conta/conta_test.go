@@ -16,15 +16,25 @@ func TestNovaRecusaSaldoNaoFinito(t *testing.T) {
 
 func TestDefinirSaldoMantemEstadoQuandoInvalido(t *testing.T) {
 	conta, err := Nova(1, 100, true)
-	if err != nil { t.Fatal(err) }
-	if err := conta.DefinirSaldo(math.Inf(1)); !errors.Is(err, ErrSaldoNaoFinito) { t.Fatal(err) }
-	if conta.Saldo() != 100 { t.Fatalf("saldo alterado: %v", conta.Saldo()) }
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := conta.DefinirSaldo(math.Inf(1)); !errors.Is(err, ErrSaldoNaoFinito) {
+		t.Fatal(err)
+	}
+	if conta.Saldo() != 100 {
+		t.Fatalf("saldo alterado: %v", conta.Saldo())
+	}
 }
 
 func TestSituacaoDaContaEIdempotente(t *testing.T) {
 	conta, _ := Nova(1, 0, false)
 	conta.Desativar()
-	if conta.Situacao() != Inativa { t.Fatal("conta deveria permanecer inativa") }
+	if conta.Situacao() != Inativa {
+		t.Fatal("conta deveria permanecer inativa")
+	}
 	conta.Ativar()
-	if conta.Situacao() != Ativa { t.Fatal("conta deveria estar ativa") }
+	if conta.Situacao() != Ativa {
+		t.Fatal("conta deveria estar ativa")
+	}
 }

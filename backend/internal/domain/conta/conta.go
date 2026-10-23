@@ -31,12 +31,13 @@ func Nova(id int, saldo float64, ativa bool) (*ContaCorrente, error) {
 	return &ContaCorrente{id: id, saldo: saldo, situacao: situacao}, nil
 }
 
-func (c *ContaCorrente) ID() int            { return c.id }
-func (c *ContaCorrente) Saldo() float64     { return c.saldo }
-func (c *ContaCorrente) Situacao() Situacao { return c.situacao }
-func (c *ContaCorrente) EstaAtiva() bool    { return c.situacao == Ativa }
-func (c *ContaCorrente) Ativar()            { c.situacao = Ativa }
-func (c *ContaCorrente) Desativar()         { c.situacao = Inativa }
+func (c *ContaCorrente) ID() int               { return c.id }
+func (c *ContaCorrente) Saldo() float64        { return c.saldo }
+func (c *ContaCorrente) Situacao() Situacao    { return c.situacao }
+func (c *ContaCorrente) EstaAtiva() bool       { return c.situacao == Ativa }
+func (c *ContaCorrente) Ativar()               { c.situacao = Ativa }
+func (c *ContaCorrente) Desativar()            { c.situacao = Inativa }
+func (c *ContaCorrente) Copia() *ContaCorrente { copia := *c; return &copia }
 func (c *ContaCorrente) DefinirSaldo(saldo float64) error {
 	if !finito(saldo) {
 		return ErrSaldoNaoFinito

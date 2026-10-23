@@ -46,6 +46,7 @@ func (c *Cliente) Situacao() Situacao   { return c.situacao }
 func (c *Cliente) EstaAtivo() bool      { return c.situacao == Ativo }
 func (c *Cliente) Ativar()              { c.situacao = Ativo }
 func (c *Cliente) Desativar()           { c.situacao = Inativo }
+func (c *Cliente) Copia() *Cliente      { copia := *c; return &copia }
 
 func (c *Cliente) DefinirIdade(idade int) error {
 	if !IdadePermitida(idade) {

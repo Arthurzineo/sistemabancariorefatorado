@@ -47,7 +47,7 @@ func (r *ClienteRepositorio) Listar() []*cliente.Cliente {
 	defer r.mu.RUnlock()
 	result := make([]*cliente.Cliente, 0, len(r.dados))
 	for _, c := range r.dados {
-		result = append(result, c)
+		result = append(result, c.Copia())
 	}
 	return result
 }
@@ -96,7 +96,7 @@ func (r *ContaRepositorio) Listar() []*conta.ContaCorrente {
 	defer r.mu.RUnlock()
 	result := make([]*conta.ContaCorrente, 0, len(r.dados))
 	for _, c := range r.dados {
-		result = append(result, c)
+		result = append(result, c.Copia())
 	}
 	return result
 }
