@@ -58,3 +58,13 @@ func saldo(c *ContaCorrente) float64 {
 	}
 	return c.Saldo()
 }
+
+func TestTransferirRecusaMesmaConta(t *testing.T) {
+	conta := novaConta(t, 1, 100, true)
+	if err := Transferir(conta, conta, 10); !errors.Is(err, ErrContaOrigemEDestinoIguais) {
+		t.Fatalf("erro: %v", err)
+	}
+	if conta.Saldo() != 100 {
+		t.Fatalf("saldo alterado: %v", conta.Saldo())
+	}
+}

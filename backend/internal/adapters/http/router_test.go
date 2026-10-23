@@ -11,6 +11,7 @@ import (
 	contadomain "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/domain/conta"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -102,5 +103,24 @@ func TestTransferenciaEMapeamentoDeErros(t *testing.T) {
 	var resposta map[string]string
 	if err := json.Unmarshal(w.Body.Bytes(), &resposta); err != nil || resposta["erro"] != "conta_origem_inativa" {
 		t.Fatalf("resposta: %s", w.Body.String())
+	}
+}
+
+func TestRouterRecusaIDsNaoPositivosECorpoGrande(t *testing.T) {
+	clientes := clienteapp.NovoServico(memory.NovoClienteRepositorio())
+	contas := contaapp.NovoServico(memory.NovoContaRepositorio())
+	r := NovoRouter(clientes, contas)
+	for _, path := range []string{"/api/clientes/0", "/api/clientes/-1", "/api/contas/0"} {
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, path, nil))
+		if w.Code != http.StatusBadRequest {
+			t.Fatalf("%s: status %d", path, w.Code)
+		}
+	}
+	body := bytes.NewBufferString(`{"id":1,"nome":"` + strings.Repeat("a", 2<<20) + `","idade":25,"email":"a@b.com","idContaCorrente":1,"ativo":true}`)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodPost, "/api/clientes", body))
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("corpo grande: status %d", w.Code)
 	}
 }
