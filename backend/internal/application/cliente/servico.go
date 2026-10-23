@@ -46,7 +46,7 @@ func (s *Servico) Ativar(id int) error {
 		return e
 	}
 	c.Ativar()
-	return nil
+	return s.repositorio.Atualizar(c)
 }
 func (s *Servico) Desativar(id int) error {
 	c, e := s.Consultar(id)
@@ -54,7 +54,7 @@ func (s *Servico) Desativar(id int) error {
 		return e
 	}
 	c.Desativar()
-	return nil
+	return s.repositorio.Atualizar(c)
 }
 func (s *Servico) Situacao(id int) (domain.Situacao, error) {
 	c, err := s.Consultar(id)

@@ -11,9 +11,18 @@ var (
 	ErrContaNaoEncontrada = errors.New("conta nao encontrada")
 )
 
-type Servico struct{ repositorio ports.ContaRepository }
+type Servico struct {
+	repositorio ports.ContaRepository
+	uow         ports.UnitOfWork
+}
 
-func NovoServico(repositorio ports.ContaRepository) *Servico { return &Servico{repositorio} }
+func NovoServico(repositorio ports.ContaRepository) *Servico {
+	s := &Servico{repositorio: repositorio}
+	if uow, ok := repositorio.(ports.UnitOfWork); ok {
+		s.uow = uow
+	}
+	return s
+}
 func (s *Servico) Cadastrar(id int, saldo float64, ativa bool) (*domain.ContaCorrente, error) {
 	if _, ok := s.repositorio.Buscar(id); ok {
 		return nil, ErrIDDuplicado
@@ -46,7 +55,7 @@ func (s *Servico) Ativar(id int) error {
 		return e
 	}
 	c.Ativar()
-	return nil
+	return s.repositorio.Atualizar(c)
 }
 func (s *Servico) Desativar(id int) error {
 	c, e := s.Consultar(id)
@@ -54,18 +63,29 @@ func (s *Servico) Desativar(id int) error {
 		return e
 	}
 	c.Desativar()
-	return nil
+	return s.repositorio.Atualizar(c)
 }
 func (s *Servico) Transferir(origemID, destinoID int, valor float64) error {
-	origem, ok := s.repositorio.Buscar(origemID)
-	if !ok {
-		return domain.ErrContaOrigemNaoEncontrada
+	if s.uow == nil {
+		return errors.New("unit of work obrigatoria para transferencia")
 	}
-	destino, ok := s.repositorio.Buscar(destinoID)
-	if !ok {
-		return domain.ErrContaDestinoNaoEncontrada
-	}
-	return domain.Transferir(origem, destino, valor)
+	return s.uow.Executar(func(repo ports.ContaRepository) error {
+		origem, ok := repo.Buscar(origemID)
+		if !ok {
+			return domain.ErrContaOrigemNaoEncontrada
+		}
+		destino, ok := repo.Buscar(destinoID)
+		if !ok {
+			return domain.ErrContaDestinoNaoEncontrada
+		}
+		if err := domain.Transferir(origem, destino, valor); err != nil {
+			return err
+		}
+		if err := repo.Atualizar(origem); err != nil {
+			return err
+		}
+		return repo.Atualizar(destino)
+	})
 }
 
 func (s *Servico) Situacao(id int) (domain.Situacao, error) {
