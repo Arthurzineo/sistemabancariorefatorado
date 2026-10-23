@@ -12,7 +12,10 @@ func Aplicar(clientes ports.ClienteRepository, contas ports.ContaRepository) err
 		saldo float64
 	}{{1, 100}, {2, 100}} {
 		if _, ok := contas.Buscar(v.id); !ok {
-			c, _ := conta.Nova(v.id, v.saldo, true)
+			c, err := conta.Nova(v.id, v.saldo, true)
+			if err != nil {
+				return err
+			}
 			if e := contas.Adicionar(c); e != nil {
 				return e
 			}
@@ -23,7 +26,10 @@ func Aplicar(clientes ports.ClienteRepository, contas ports.ContaRepository) err
 		nome, email      string
 	}{{1, 31, 1, "Maria Silva", "mariasilva@gmail.com"}, {2, 34, 2, "Felipe Augusto", "felipeaugusto@gmail.com"}} {
 		if _, ok := clientes.Buscar(v.id); !ok {
-			c, _ := cliente.Novo(v.id, v.nome, v.idade, v.email, v.conta, true)
+			c, err := cliente.Novo(v.id, v.nome, v.idade, v.email, v.conta, true)
+			if err != nil {
+				return err
+			}
 			if e := clientes.Adicionar(c); e != nil {
 				return e
 			}
