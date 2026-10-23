@@ -56,3 +56,10 @@ func (s *Servico) Desativar(id int) error {
 	c.Desativar()
 	return nil
 }
+func (s *Servico) Situacao(id int) (domain.Situacao, error) {
+	c, err := s.Consultar(id)
+	if err != nil {
+		return "", err
+	}
+	return c.Situacao(), nil
+}
