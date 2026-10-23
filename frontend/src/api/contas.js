@@ -1,5 +1,6 @@
 import { requisicao } from './http.js'
 export const listarContas = () => requisicao('/api/contas')
+export const consultarConta = (id) => requisicao(`/api/contas/${id}`)
 export const cadastrarConta = (dados) => requisicao('/api/contas', { method: 'POST', body: JSON.stringify(dados) })
 export const acaoConta = (id, acao) => requisicao(`/api/contas/${id}/${acao}`, { method: 'POST' })
 export const removerConta = (id) => requisicao(`/api/contas/${id}`, { method: 'DELETE' })
