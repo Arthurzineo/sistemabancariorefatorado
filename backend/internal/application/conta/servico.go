@@ -46,7 +46,7 @@ func (s *Servico) Ativar(id int) error {
 		return e
 	}
 	c.Ativar()
-	return nil
+	return s.repositorio.Atualizar(c)
 }
 func (s *Servico) Desativar(id int) error {
 	c, e := s.Consultar(id)
@@ -54,7 +54,7 @@ func (s *Servico) Desativar(id int) error {
 		return e
 	}
 	c.Desativar()
-	return nil
+	return s.repositorio.Atualizar(c)
 }
 func (s *Servico) Transferir(origemID, destinoID int, valor float64) error {
 	origem, ok := s.repositorio.Buscar(origemID)
@@ -65,7 +65,13 @@ func (s *Servico) Transferir(origemID, destinoID int, valor float64) error {
 	if !ok {
 		return domain.ErrContaDestinoNaoEncontrada
 	}
-	return domain.Transferir(origem, destino, valor)
+	if err := domain.Transferir(origem, destino, valor); err != nil {
+		return err
+	}
+	if err := s.repositorio.Atualizar(origem); err != nil {
+		return err
+	}
+	return s.repositorio.Atualizar(destino)
 }
 
 func (s *Servico) Situacao(id int) (domain.Situacao, error) {

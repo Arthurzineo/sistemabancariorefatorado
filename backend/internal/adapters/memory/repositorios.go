@@ -24,14 +24,26 @@ func (r *ClienteRepositorio) Adicionar(c *cliente.Cliente) error {
 	if _, ok := r.dados[c.ID()]; ok {
 		return ErrIDDuplicado
 	}
-	r.dados[c.ID()] = c
+	r.dados[c.ID()] = c.Copia()
 	return nil
 }
 func (r *ClienteRepositorio) Buscar(id int) (*cliente.Cliente, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	c, ok := r.dados[id]
-	return c, ok
+	if !ok {
+		return nil, false
+	}
+	return c.Copia(), true
+}
+func (r *ClienteRepositorio) Atualizar(c *cliente.Cliente) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.dados[c.ID()]; !ok {
+		return errors.New("cliente nao encontrado")
+	}
+	r.dados[c.ID()] = c.Copia()
+	return nil
 }
 func (r *ClienteRepositorio) Remover(id int) bool {
 	r.mu.Lock()
@@ -66,7 +78,7 @@ func (r *ContaRepositorio) Adicionar(c *conta.ContaCorrente) error {
 	if _, ok := r.dados[c.ID()]; ok {
 		return ErrIDDuplicado
 	}
-	r.dados[c.ID()] = c
+	r.dados[c.ID()] = c.Copia()
 	return nil
 }
 func (r *ContaRepositorio) AdicionarComSaldo(id int, saldo float64, ativa bool) error {
@@ -80,7 +92,19 @@ func (r *ContaRepositorio) Buscar(id int) (*conta.ContaCorrente, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	c, ok := r.dados[id]
-	return c, ok
+	if !ok {
+		return nil, false
+	}
+	return c.Copia(), true
+}
+func (r *ContaRepositorio) Atualizar(c *conta.ContaCorrente) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.dados[c.ID()]; !ok {
+		return errors.New("conta nao encontrada")
+	}
+	r.dados[c.ID()] = c.Copia()
+	return nil
 }
 func (r *ContaRepositorio) Remover(id int) bool {
 	r.mu.Lock()

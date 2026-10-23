@@ -7,6 +7,7 @@ import (
 
 type ClienteRepository interface {
 	Adicionar(*cliente.Cliente) error
+	Atualizar(*cliente.Cliente) error
 	Buscar(int) (*cliente.Cliente, bool)
 	Remover(int) bool
 	Listar() []*cliente.Cliente
@@ -14,6 +15,7 @@ type ClienteRepository interface {
 
 type ContaRepository interface {
 	Adicionar(*conta.ContaCorrente) error
+	Atualizar(*conta.ContaCorrente) error
 	Buscar(int) (*conta.ContaCorrente, bool)
 	Remover(int) bool
 	Listar() []*conta.ContaCorrente
