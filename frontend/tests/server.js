@@ -55,7 +55,10 @@ export const server = setupServer(
   http.get("/api/clientes/:id/situacao", () =>
     HttpResponse.json({ situacao: "Ativo" }),
   ),
-  http.delete("/api/clientes/:id", () => new HttpResponse(null, { status: 204 })),
+  http.delete(
+    "/api/clientes/:id",
+    () => new HttpResponse(null, { status: 204 }),
+  ),
   http.post("/api/contas/:id/:acao", () =>
     HttpResponse.json({ id: 1, saldo: 100, situacao: "Ativa" }),
   ),
