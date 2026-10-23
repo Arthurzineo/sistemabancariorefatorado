@@ -3,9 +3,12 @@ package http
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/adapters/memory"
 	clienteapp "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/cliente"
 	contaapp "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/conta"
+	clientedomain "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/domain/cliente"
+	contadomain "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/domain/conta"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -47,11 +50,40 @@ func TestRotasDeClientesEContas(t *testing.T) {
 			}
 		})
 	}
+	for _, path := range []string{"/api/clientes", "/api/clientes/1", "/api/contas", "/api/contas/1"} {
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, path, nil))
+		if w.Code != http.StatusOK {
+			t.Fatalf("get %s: %d", path, w.Code)
+		}
+	}
 	for _, path := range []string{"/api/clientes/1", "/api/contas/1"} {
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, httptest.NewRequest(http.MethodDelete, path, nil))
 		if w.Code != http.StatusNoContent {
 			t.Fatalf("delete %s: %d", path, w.Code)
+		}
+	}
+}
+
+func TestMapearTodosOsErrosDoDominio(t *testing.T) {
+	for _, tc := range []struct {
+		erro   error
+		codigo string
+		status int
+	}{
+		{clienteapp.ErrClienteNaoEncontrado, "cliente_nao_encontrado", 404}, {contaapp.ErrContaNaoEncontrada, "conta_nao_encontrada", 404},
+		{contadomain.ErrContaOrigemNaoEncontrada, "conta_origem_nao_encontrada", 404}, {contadomain.ErrContaDestinoNaoEncontrada, "conta_destino_nao_encontrada", 404},
+		{clienteapp.ErrIDDuplicado, "id_duplicado", 409}, {contaapp.ErrIDDuplicado, "id_duplicado", 409}, {clientedomain.ErrIdadeNaoPermitida, "idade_nao_permitida", 422},
+		{contadomain.ErrSaldoNaoFinito, "saldo_nao_finito", 422}, {contadomain.ErrValorInvalido, "valor_invalido", 422}, {contadomain.ErrSaldoInsuficiente, "saldo_insuficiente", 422},
+		{contadomain.ErrCreditoNaoFinito, "credito_nao_finito", 422}, {contadomain.ErrContaOrigemInativa, "conta_origem_inativa", 422}, {contadomain.ErrContaDestinoInativa, "conta_destino_inativa", 422},
+	} {
+		w := httptest.NewRecorder()
+		mapearErro(w, errors.Join(tc.erro))
+		var body map[string]string
+		_ = json.Unmarshal(w.Body.Bytes(), &body)
+		if w.Code != tc.status || body["erro"] != tc.codigo {
+			t.Fatalf("%v: status=%d codigo=%q", tc.erro, w.Code, body["erro"])
 		}
 	}
 }
