@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"errors"
 	clienteapp "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/cliente"
 	contaapp "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/conta"
 	stdhttp "net/http"
@@ -54,6 +55,22 @@ func NovoRouter(clientes *clienteapp.Servico, contas *contaapp.Servico) stdhttp.
 		}
 		_ = json.NewEncoder(w).Encode(c)
 	})
+	mux.HandleFunc("POST /api/transferencias", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
+		var in struct {
+			Origem  int     `json:"origem"`
+			Destino int     `json:"destino"`
+			Valor   float64 `json:"valor"`
+		}
+		if json.NewDecoder(r.Body).Decode(&in) != nil {
+			erro(w, 400, "requisicao_invalida", "JSON invalido")
+			return
+		}
+		if e := contas.Transferir(in.Origem, in.Destino, in.Valor); e != nil {
+			mapearErro(w, e)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	})
 	return mux
 }
 
@@ -61,4 +78,16 @@ func erro(w stdhttp.ResponseWriter, status int, codigo, mensagem string) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(map[string]string{"erro": codigo, "mensagem": mensagem})
+}
+func mapearErro(w stdhttp.ResponseWriter, e error) {
+	codigo, status := "erro", 422
+	switch {
+	case errors.Is(e, contaapp.ErrContaNaoEncontrada):
+		codigo, status = "conta_nao_encontrada", 404
+	case errors.Is(e, contaapp.ErrIDDuplicado):
+		codigo, status = "id_duplicado", 409
+	case errors.Is(e, clienteapp.ErrClienteNaoEncontrado):
+		codigo, status = "cliente_nao_encontrado", 404
+	}
+	erro(w, status, codigo, e.Error())
 }
