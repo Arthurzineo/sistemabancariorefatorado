@@ -2,6 +2,7 @@ package memory
 
 import (
 	"errors"
+	"github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/ports"
 	"github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/domain/conta"
 	"testing"
 )
@@ -11,7 +12,7 @@ func TestUnitOfWorkDescartaAlteracoesEmErro(t *testing.T) {
 	c, _ := conta.Nova(1, 100, true)
 	_ = r.Adicionar(c)
 	uow := NovaUnitOfWork(r)
-	if err := uow.Executar(func(tx *ContaRepositorio) error {
+	if err := uow.Executar(func(tx ports.ContaRepository) error {
 		c, _ := tx.Buscar(1)
 		_ = c.DefinirSaldo(0)
 		_ = tx.Atualizar(c)

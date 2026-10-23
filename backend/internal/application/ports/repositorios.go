@@ -20,3 +20,7 @@ type ContaRepository interface {
 	Remover(int) bool
 	Listar() []*conta.ContaCorrente
 }
+
+type UnitOfWork interface {
+	Executar(func(ContaRepository) error) error
+}
