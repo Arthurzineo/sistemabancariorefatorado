@@ -7,7 +7,7 @@ import (
 )
 
 func TestHealth(t *testing.T) {
-	r := NovoRouter()
+	r := NovoRouter(nil, nil)
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/health", nil))
 	if w.Code != http.StatusOK {
