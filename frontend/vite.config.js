@@ -7,6 +7,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/setup.js"],
     globals: true,
+    exclude: ["e2e/**", "node_modules/**"],
   },
   server: { proxy: { "/api": "http://localhost:8080" } },
 });

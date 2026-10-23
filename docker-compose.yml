@@ -1,0 +1,33 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      DB_PATH: /data/banco.db
+      SEED: "true"
+      PORT: "8080"
+    volumes:
+      - banco-data:/data
+    networks:
+      - banco-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    stop_grace_period: 10s
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - banco-net
+    stop_grace_period: 10s
+networks:
+  banco-net:
+    driver: bridge
+volumes:
+  banco-data:
