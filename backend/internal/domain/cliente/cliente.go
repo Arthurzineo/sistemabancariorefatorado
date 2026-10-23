@@ -50,7 +50,10 @@ func Novo(id int, nome string, idade int, email string, idContaCorrente int, ati
 	if ativo {
 		situacao = Ativo
 	}
-	return &Cliente{id: id, nome: nome, idade: idade, email: email, idContaCorrente: idContaCorrente, situacao: situacao}, nil
+	return &Cliente{
+		id: id, nome: nome, idade: idade, email: email,
+		idContaCorrente: idContaCorrente, situacao: situacao,
+	}, nil
 }
 
 func IdadePermitida(idade int) bool     { return idade >= IdadeMinima && idade <= IdadeMaxima }

@@ -20,7 +20,16 @@ func Abrir(origem string) (*Banco, error) {
 }
 
 func (b *Banco) Fechar() error { return b.db.Close() }
+
 func (b *Banco) Migrar() error {
-	_, err := b.db.Exec(`CREATE TABLE IF NOT EXISTS clientes (id INTEGER PRIMARY KEY, nome TEXT NOT NULL, idade INTEGER NOT NULL, email TEXT NOT NULL, id_conta_corrente INTEGER NOT NULL, situacao TEXT NOT NULL); CREATE TABLE IF NOT EXISTS contas (id INTEGER PRIMARY KEY, saldo REAL NOT NULL, situacao TEXT NOT NULL);`)
+	const schema = `
+CREATE TABLE IF NOT EXISTS clientes (
+  id INTEGER PRIMARY KEY, nome TEXT NOT NULL, idade INTEGER NOT NULL,
+  email TEXT NOT NULL, id_conta_corrente INTEGER NOT NULL, situacao TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS contas (
+  id INTEGER PRIMARY KEY, saldo REAL NOT NULL, situacao TEXT NOT NULL
+);`
+	_, err := b.db.Exec(schema)
 	return err
 }
