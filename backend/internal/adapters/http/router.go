@@ -5,6 +5,7 @@ import (
 	clienteapp "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/cliente"
 	contaapp "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/conta"
 	stdhttp "net/http"
+	"strconv"
 )
 
 func NovoRouter(clientes *clienteapp.Servico, contas *contaapp.Servico) stdhttp.Handler {
@@ -26,6 +27,32 @@ func NovoRouter(clientes *clienteapp.Servico, contas *contaapp.Servico) stdhttp.
 			return
 		}
 		json.NewEncoder(w).Encode(contas.Listar())
+	})
+	mux.HandleFunc("GET /api/clientes/{id}", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
+		id, e := strconv.Atoi(r.PathValue("id"))
+		if e != nil {
+			erro(w, 400, "requisicao_invalida", "id invalido")
+			return
+		}
+		c, e := clientes.Consultar(id)
+		if e != nil {
+			erro(w, 404, "cliente_nao_encontrado", e.Error())
+			return
+		}
+		_ = json.NewEncoder(w).Encode(c)
+	})
+	mux.HandleFunc("GET /api/contas/{id}", func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
+		id, e := strconv.Atoi(r.PathValue("id"))
+		if e != nil {
+			erro(w, 400, "requisicao_invalida", "id invalido")
+			return
+		}
+		c, e := contas.Consultar(id)
+		if e != nil {
+			erro(w, 404, "conta_nao_encontrada", e.Error())
+			return
+		}
+		_ = json.NewEncoder(w).Encode(c)
 	})
 	return mux
 }
