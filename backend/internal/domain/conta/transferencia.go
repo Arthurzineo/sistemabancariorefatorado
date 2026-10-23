@@ -13,6 +13,8 @@ var (
 	ErrCreditoNaoFinito          = errors.New("credito deixaria saldo de destino nao finito")
 	ErrContaOrigemInativa        = errors.New("conta de origem inativa")
 	ErrContaDestinoInativa       = errors.New("conta de destino inativa")
+	ErrMesmaConta                = errors.New("conta de origem e destino devem ser diferentes")
+	ErrContaOrigemEDestinoIguais = ErrMesmaConta
 )
 
 func Transferir(origem, destino *ContaCorrente, valor float64) error {
@@ -21,6 +23,9 @@ func Transferir(origem, destino *ContaCorrente, valor float64) error {
 	}
 	if destino == nil {
 		return ErrContaDestinoNaoEncontrada
+	}
+	if origem.ID() == destino.ID() {
+		return ErrMesmaConta
 	}
 	if valor <= 0 || math.IsNaN(valor) {
 		return ErrValorInvalido

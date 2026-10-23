@@ -38,7 +38,14 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	srv := &http.Server{Addr: ":" + port, Handler: httpadapter.NovoRouter(clienteapp.NovoServico(clientes), contaapp.NovoServico(contas))}
+	srv := &http.Server{
+		Addr:              ":" + port,
+		Handler:           httpadapter.NovoRouter(clienteapp.NovoServico(clientes), contaapp.NovoServico(contas)),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)

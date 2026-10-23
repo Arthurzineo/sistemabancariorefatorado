@@ -11,6 +11,7 @@ import (
 	contadomain "github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/domain/conta"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -32,7 +33,8 @@ func TestRotasDeClientesEContas(t *testing.T) {
 		method, path, body string
 		want               int
 	}{
-		{"POST", "/api/clientes", `{"id":1,"nome":"Ana","idade":25,"email":"ana@ex.com","idContaCorrente":1,"ativo":true}`, 201},
+		{"POST", "/api/clientes", `{"id":1,"nome":"Ana","idade":25,"email":"ana@ex.com",` +
+			`"idContaCorrente":1,"ativo":true}`, 201},
 		{"GET", "/api/clientes/validacao-idade?idade=17", "", 200},
 		{"POST", "/api/clientes/1/desativar", "", 200},
 		{"GET", "/api/clientes/1/situacao", "", 200},
@@ -72,11 +74,19 @@ func TestMapearTodosOsErrosDoDominio(t *testing.T) {
 		codigo string
 		status int
 	}{
-		{clienteapp.ErrClienteNaoEncontrado, "cliente_nao_encontrado", 404}, {contaapp.ErrContaNaoEncontrada, "conta_nao_encontrada", 404},
-		{contadomain.ErrContaOrigemNaoEncontrada, "conta_origem_nao_encontrada", 404}, {contadomain.ErrContaDestinoNaoEncontrada, "conta_destino_nao_encontrada", 404},
-		{clienteapp.ErrIDDuplicado, "id_duplicado", 409}, {contaapp.ErrIDDuplicado, "id_duplicado", 409}, {clientedomain.ErrIdadeNaoPermitida, "idade_nao_permitida", 422},
-		{contadomain.ErrSaldoNaoFinito, "saldo_nao_finito", 422}, {contadomain.ErrValorInvalido, "valor_invalido", 422}, {contadomain.ErrSaldoInsuficiente, "saldo_insuficiente", 422},
-		{contadomain.ErrCreditoNaoFinito, "credito_nao_finito", 422}, {contadomain.ErrContaOrigemInativa, "conta_origem_inativa", 422}, {contadomain.ErrContaDestinoInativa, "conta_destino_inativa", 422},
+		{clienteapp.ErrClienteNaoEncontrado, "cliente_nao_encontrado", 404},
+		{contaapp.ErrContaNaoEncontrada, "conta_nao_encontrada", 404},
+		{contadomain.ErrContaOrigemNaoEncontrada, "conta_origem_nao_encontrada", 404},
+		{contadomain.ErrContaDestinoNaoEncontrada, "conta_destino_nao_encontrada", 404},
+		{clienteapp.ErrIDDuplicado, "id_duplicado", 409},
+		{contaapp.ErrIDDuplicado, "id_duplicado", 409},
+		{clientedomain.ErrIdadeNaoPermitida, "idade_nao_permitida", 422},
+		{contadomain.ErrSaldoNaoFinito, "saldo_nao_finito", 422},
+		{contadomain.ErrValorInvalido, "valor_invalido", 422},
+		{contadomain.ErrSaldoInsuficiente, "saldo_insuficiente", 422},
+		{contadomain.ErrCreditoNaoFinito, "credito_nao_finito", 422},
+		{contadomain.ErrContaOrigemInativa, "conta_origem_inativa", 422},
+		{contadomain.ErrContaDestinoInativa, "conta_destino_inativa", 422},
 	} {
 		w := httptest.NewRecorder()
 		mapearErro(w, errors.Join(tc.erro))
@@ -95,12 +105,54 @@ func TestTransferenciaEMapeamentoDeErros(t *testing.T) {
 	_, _ = contas.Cadastrar(2, 0, true)
 	r := NovoRouter(clientes, contas)
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, httptest.NewRequest(http.MethodPost, "/api/transferencias", bytes.NewBufferString(`{"origem":1,"destino":2,"valor":10}`)))
+	r.ServeHTTP(w, httptest.NewRequest(
+		http.MethodPost, "/api/transferencias",
+		bytes.NewBufferString(`{"origem":1,"destino":2,"valor":10}`),
+	))
 	if w.Code != http.StatusUnprocessableEntity {
 		t.Fatalf("status: %d body: %s", w.Code, w.Body.String())
 	}
 	var resposta map[string]string
 	if err := json.Unmarshal(w.Body.Bytes(), &resposta); err != nil || resposta["erro"] != "conta_origem_inativa" {
 		t.Fatalf("resposta: %s", w.Body.String())
+	}
+}
+
+func TestTransferenciaMesmaContaRetorna422(t *testing.T) {
+	contas := contaapp.NovoServico(memory.NovoContaRepositorio())
+	_, _ = contas.Cadastrar(1, 100, true)
+	r := NovoRouter(clienteapp.NovoServico(memory.NovoClienteRepositorio()), contas)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, httptest.NewRequest(
+		http.MethodPost, "/api/transferencias",
+		bytes.NewBufferString(`{"origem":1,"destino":1,"valor":10}`),
+	))
+	if w.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("status: %d", w.Code)
+	}
+	if !strings.Contains(w.Body.String(), `"erro":"mesma_conta"`) {
+		t.Fatalf("body: %s", w.Body.String())
+	}
+}
+
+func TestRouterRecusaIDsNaoPositivosECorpoGrande(t *testing.T) {
+	clientes := clienteapp.NovoServico(memory.NovoClienteRepositorio())
+	contas := contaapp.NovoServico(memory.NovoContaRepositorio())
+	r := NovoRouter(clientes, contas)
+	for _, path := range []string{"/api/clientes/0", "/api/clientes/-1", "/api/contas/0"} {
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, path, nil))
+		if w.Code != http.StatusUnprocessableEntity {
+			t.Fatalf("%s: status %d", path, w.Code)
+		}
+	}
+	body := bytes.NewBufferString(
+		`{"id":1,"nome":"` + strings.Repeat("a", 2<<20) +
+			`","idade":25,"email":"a@b.com","idContaCorrente":1,"ativo":true}`,
+	)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodPost, "/api/clientes", body))
+	if w.Code != http.StatusRequestEntityTooLarge {
+		t.Fatalf("corpo grande: status %d", w.Code)
 	}
 }
