@@ -49,4 +49,18 @@ export const server = setupServer(
       { status: 422 },
     ),
   ),
+  http.post("/api/clientes/:id/:acao", () =>
+    HttpResponse.json({ id: 1, nome: "Ana", situacao: "Ativo" }),
+  ),
+  http.get("/api/clientes/:id/situacao", () =>
+    HttpResponse.json({ situacao: "Ativo" }),
+  ),
+  http.delete("/api/clientes/:id", () => new HttpResponse(null, { status: 204 })),
+  http.post("/api/contas/:id/:acao", () =>
+    HttpResponse.json({ id: 1, saldo: 100, situacao: "Ativa" }),
+  ),
+  http.get("/api/contas/:id/situacao", () =>
+    HttpResponse.json({ situacao: "Ativa" }),
+  ),
+  http.delete("/api/contas/:id", () => new HttpResponse(null, { status: 204 })),
 );
