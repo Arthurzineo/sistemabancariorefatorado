@@ -1,0 +1,7 @@
+.git
+coverage.out
+banco.db
+tmp
+**/*_test.go
+features
+tests
