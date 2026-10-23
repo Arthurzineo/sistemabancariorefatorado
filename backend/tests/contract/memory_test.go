@@ -1,0 +1,35 @@
+package contract
+
+import (
+	"github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/adapters/memory"
+	"github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/domain/conta"
+	"testing"
+)
+
+func TestContratoContaMemory(t *testing.T) {
+	r := memory.NovoContaRepositorio()
+	c, _ := conta.Nova(1, 10, true)
+	if err := r.Adicionar(c); err != nil {
+		t.Fatal(err)
+	}
+	if err := r.Adicionar(c); err == nil {
+		t.Fatal("id duplicado aceito")
+	}
+	buscada, ok := r.Buscar(1)
+	if !ok {
+		t.Fatal("conta ausente")
+	}
+	_ = buscada.DefinirSaldo(20)
+	if err := r.Atualizar(buscada); err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := r.Buscar(1); got.Saldo() != 20 {
+		t.Fatal("atualizacao perdida")
+	}
+	if !r.Remover(1) {
+		t.Fatal("remocao falhou")
+	}
+	if _, ok := r.Buscar(1); ok {
+		t.Fatal("conta removida encontrada")
+	}
+}
