@@ -41,59 +41,58 @@ cmd/api (composition root) conhece todos e os conecta
 O `domain` não importa nada do projeto. A `application` só importa o `domain`.
 Os adapters importam a `application` (portas) e o `domain`.
 
-### Estrutura de pastas (adotada — ver ADR-016)
+### Estrutura de pastas (adotada — ver ADR-016, ADR-018 e ADR-019)
 
 Todo o código fica em `sistemabancariorefatorado/` (repositório git próprio); os caminhos abaixo são relativos a ela.
 
 ```text
 backend/
-├── cmd/api/main.go                 # composition root: lê config, cria adapters, injeta, sobe HTTP
+├── cmd/api/main.go                 # composition root: lê config, cria adapters, injeta, sobe HTTP com timeouts
 ├── internal/
 │   ├── domain/
 │   │   ├── cliente/
-│   │   │   ├── cliente.go          # entidade Cliente, validação de idade (18..65), situação e erros
+│   │   │   ├── cliente.go          # entidade Cliente, validação de nome/email/idade (18..65), situação e erros
 │   │   │   └── cliente_test.go
 │   │   └── conta/
 │   │       ├── conta.go            # entidade ContaCorrente, saldo finito e situação
 │   │       ├── conta_test.go
-│   │       ├── transferencia.go    # serviço de domínio: regras do R12 (7 condições atômicas)
+│   │       ├── transferencia.go    # serviço de domínio: regras do R12 (8 condições atômicas, incluindo mesma conta — ADR-018)
 │   │       └── transferencia_test.go
 │   ├── application/
 │   │   ├── ports/
-│   │   │   ├── repositorios.go     # interfaces ClienteRepository e ContaRepository
-│   │   │   └── unit_of_work.go     # porta transacional para operações atômicas (P003 / T023)
+│   │   │   └── repositorios.go     # interfaces ClienteRepository, ContaRepository e UnitOfWork
 │   │   ├── cliente/
 │   │   │   ├── servico.go          # casos de uso de cliente (consultar, cadastrar, validar idade, ativar, desativar, situação, remover)
 │   │   │   ├── casos_de_uso_test.go
 │   │   │   └── operacoes_test.go
 │   │   └── conta/
-│   │       ├── servico.go          # casos de uso de conta (consultar, cadastrar, transferir, ativar, desativar, situação, remover)
+│   │       ├── servico.go          # casos de uso de conta (consultar, cadastrar, transferir com UoW, ativar, desativar, situação, remover)
 │   │       ├── servico_test.go
 │   │       └── operacoes_test.go
 │   ├── adapters/
 │   │   ├── http/
-│   │   │   ├── router.go
-│   │   │   ├── cliente_handler.go
-│   │   │   ├── conta_handler.go
-│   │   │   ├── transferencia_handler.go
-│   │   │   ├── erros.go            # erro de domínio → status HTTP
-│   │   │   └── dto/
+│   │   │   ├── router.go           # registro de rotas no ServeMux padrão do Go 1.22+
+│   │   │   ├── cliente_handler.go  # endpoints de clientes (/api/clientes, ativação, desativação, remoção)
+│   │   │   ├── conta_handler.go    # endpoints de contas (/api/contas, ativação, desativação, remoção)
+│   │   │   ├── transferencia_handler.go # endpoint de transferência (/api/transferencias) com Unit of Work
+│   │   │   ├── erros.go            # mapeamento erro de domínio → status HTTP e payload JSON padronizado
+│   │   │   ├── json.go             # decodificação segura (http.MaxBytesReader 1 MiB → 413, JSON estrito, validação id > 0)
+│   │   │   └── router_test.go
 │   │   ├── sqlite/
-│   │   │   ├── db.go               # abertura/conexão
-│   │   │   ├── migrations.go
-│   │   │   ├── cliente_dao.go
-│   │   │   ├── conta_dao.go
-│   │   │   └── unit_of_work.go
+│   │   │   ├── banco.go            # abertura de conexão com modo WAL (_pragma=journal_mode(WAL)) e migrações
+│   │   │   ├── cliente_repositorio.go
+│   │   │   ├── conta_repositorio.go
+│   │   │   └── unit_of_work.go     # controle transacional BEGIN / COMMIT / ROLLBACK
 │   │   └── memory/                 # repositório em memória (testes e modo dev)
 │   │       ├── repositorios.go     # implementação em memória com cópias defensivas
 │   │       ├── repositorios_test.go
 │   │       └── persistencia_test.go
-│   ├── seed/seed.go                # dados iniciais (equivale à CargaInicialFactory)
+│   ├── seed/seed.go                # dados iniciais idempotentes
 │   └── config/config.go
-├── features/                       # .feature em português (godog, P004)
+├── features/                       # 18 cenários .feature em português (godog, P004 e P007)
 ├── tests/
-│   ├── bdd/                        # step definitions (P004)
-│   └── contract/                   # mesma suíte rodando contra memory e sqlite (P003 / T023)
+│   ├── bdd/                        # step definitions (85 steps godog)
+│   └── contract/                   # suíte de conformidade rodando contra memory e sqlite
 ├── go.mod
 ├── Makefile
 └── Dockerfile

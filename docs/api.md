@@ -43,7 +43,7 @@ Corpo do cadastro (entrada usa `ativo` booleano, como o construtor original; a s
 
 | Método | Rota | Req. | Sucesso | Erros |
 |---|---|---|---|---|
-| POST | `/api/transferencias` | R12 | 200 `{ "origem": {conta}, "destino": {conta} }` | 404 origem/destino inexistente, 422 valor inválido / saldo insuficiente / saldo do destino não finito / conta de origem ou destino inativa |
+| POST | `/api/transferencias` | R12 | 200 `{ "origem": {conta}, "destino": {conta} }` | 404 origem/destino inexistente, 422 valor inválido / saldo insuficiente / saldo do destino não finito / conta de origem ou destino inativa / origem igual ao destino (`mesma_conta`) |
 
 ```json
 { "origem": 1, "destino": 2, "valor": 40.0 }
@@ -69,6 +69,9 @@ Corpo do cadastro (entrada usa `ativo` booleano, como o construtor original; a s
 | `ErrCreditoNaoFinito` | `credito_nao_finito` | 422 |
 | `ErrContaOrigemInativa` | `conta_origem_inativa` | 422 |
 | `ErrContaDestinoInativa` | `conta_destino_inativa` | 422 |
+| `ErrMesmaConta` | `mesma_conta` | 422 |
+| id ≤ 0 na rota ou no corpo | `id_invalido` | 422 |
+| corpo acima de 1 MiB | (nginx/`MaxBytesReader`) | 413 |
 | JSON malformado / tipo errado | `requisicao_invalida` | 400 |
 
 Observação: JSON não representa `NaN`/`Infinity`. A regra de saldo finito continua no domínio

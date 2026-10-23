@@ -51,7 +51,8 @@ A transferência só acontece se **todas** as condições valerem; senão nada m
 4. o saldo da origem é **≥ valor**;
 5. o saldo do destino continua finito após o crédito;
 6. a conta de origem está **Ativa**;
-7. a conta de destino está **Ativa**.
+7. a conta de destino está **Ativa**;
+8. a origem é **diferente** do destino ([ADR-018](decisoes.md#adr-018)).
 
 > As condições 6 e 7 são **novas** (decisão do usuário, 2026-10-22, [ADR-011](decisoes.md#adr-011)): o original permitia transferir com conta inativa.
 
@@ -107,10 +108,10 @@ inválido, saldo insuficiente). A API nova retorna esse motivo como **erro tipad
 | R09 | `CadastroContaCorrenteTest`, `UnicidadeIdentificadorTest`, `SaldoFinitoTest` | `domain/conta/conta_test.go`, `application/conta/servico_test.go`, `tests/contract/contratos_test.go`, `adapters/http/router_test.go` | `contas/componentes.test.jsx` (cadastro numérico e id duplicado) | `e2e/fluxo-bancario.spec.js` (cadastro de conta na interface) | Concluído |
 | R10 | `SituacaoContaCorrenteTest` | `domain/conta/conta_test.go`, `application/conta/operacoes_test.go`, `adapters/http/router_test.go` | `contas/componentes.test.jsx` (exibição e consulta de situação Ativa/Inativa) | — | Concluído |
 | R11 | `RemocaoTest` (conta) | `application/conta/operacoes_test.go`, `adapters/http/router_test.go` | `contas/componentes.test.jsx` (ação de remoção na lista) | — | Concluído |
-| R12 | `TransferenciaTest` (7 testes), `transferir_valores.feature` (4 cenários) | `domain/conta/transferencia_test.go`, `exploratorio_test.go`, `application/conta/servico_test.go`, `transferencia_uow_test.go`, `features/transferir_valores.feature` (6 cenários), `adapters/http/router_test.go` | `contas/componentes.test.jsx` (sucesso com saldos) + `tests/app.test.jsx` (6 erros tipados) | `e2e/fluxo-bancario.spec.js` (transferência entre contas e validação de saldos) | Concluído |
+| R12 | `TransferenciaTest` (7 testes), `transferir_valores.feature` (4 cenários) | `domain/conta/transferencia_test.go` (inclui mesma conta — ADR-018), `exploratorio_test.go`, `application/conta/servico_test.go`, `transferencia_uow_test.go`, `features/transferir_valores.feature` (7 cenários), `adapters/http/router_test.go` (422 `mesma_conta`) | `contas/componentes.test.jsx` (sucesso com saldos) + `tests/app.test.jsx` (erros tipados) | `e2e/fluxo-bancario.spec.js` (transferência entre contas e validação de saldos) | Concluído |
 
 Totais do original: 55 testes JUnit (incluindo runner) e 15 cenários BDD.
-Nas fases **P002**, **P003**, **P004**, **P005** e **P006**, todos os requisitos originais foram 100% portados e validados:
-- **Backend:** 28 testes automatizados (unidade, persistência SQLite e memória, contratos e HTTP) + 17 cenários BDD godog (80 steps).
-- **Frontend:** 26 testes de comportamento em Vitest + React Testing Library + MSW cobrindo todas as telas, formulários e 100% dos códigos de erro.
+Nas fases **P002**, **P003**, **P004**, **P005**, **P006** e **P007**, todos os requisitos originais e as extensões foram validados:
+- **Backend:** 31 funções/suítes de teste automatizadas (unidade, persistência SQLite com WAL e memória, contratos e HTTP com handlers desacoplados e segurança) + 18 cenários BDD godog (85 steps).
+- **Frontend:** 26 testes de comportamento em Vitest + React Testing Library + MSW cobrindo todas as telas, formulários e códigos de erro.
 - **E2E Ponta a Ponta:** Fluxo bancário completo automatizado em Playwright (`frontend/e2e/fluxo-bancario.spec.js`) executando contra a stack conteinerizada do Docker Compose de forma repetível e idempotente.

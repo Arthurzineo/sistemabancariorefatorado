@@ -52,14 +52,15 @@ A evidência é **só o histórico git** (decisão do usuário, 2026-10-22, ver 
 | `ddd/SituacaoClienteTest` | `domain/cliente/situacao_test.go` | `internal/application/cliente/operacoes_test.go` | Concluído (P002) |
 | `ddd/SituacaoContaCorrenteTest` | `domain/conta/situacao_test.go` | `internal/domain/conta/conta_test.go`, `internal/application/conta/operacoes_test.go` | Concluído (P002) |
 | `ddd/RemocaoTest` | `application/*/remover_test.go` | `internal/application/cliente/casos_de_uso_test.go`, `internal/application/conta/operacoes_test.go` | Concluído (P002) |
-| `bdd/*.feature` (15 originais + 2 novas) | `features/*.feature` | `features/*.feature` + `tests/bdd/bdd_test.go` (17 cenários, 80 steps godog) | Concluído (P004) |
+| `bdd/*.feature` (15 originais + 3 novas) | `features/*.feature` | `features/*.feature` + `tests/bdd/bdd_test.go` (18 cenários, 85 steps godog) | Concluído (P004/P007) |
 | `teste/TesteUnitarioManual` | não portar | — | Não portar (substituído pela automação) |
 | — (novo: persistência & isolamento) | `adapters/memory/*_test.go` | `internal/adapters/memory/repositorios_test.go`, `persistencia_test.go`, `unit_of_work_test.go` | Concluído (P002/P003) |
-| — (novo: adapter SQLite) | `adapters/sqlite/*_test.go` | `internal/adapters/sqlite/repositorios_test.go`, `conta_repositorio_test.go`, `unit_of_work_test.go` | Concluído (P003) |
-| — (novo: UoW transferência) | `application/conta/*_test.go` | `internal/application/conta/transferencia_uow_test.go` | Concluído (P003) |
+| — (novo: adapter SQLite com WAL) | `adapters/sqlite/*_test.go` | `internal/adapters/sqlite/repositorios_test.go`, `conta_repositorio_test.go`, `unit_of_work_test.go` | Concluído (P003/P007) |
+| — (novo: UoW transferência) | `application/conta/*_test.go` | `internal/application/conta/transferencia_uow_test.go`, `servico_test.go` | Concluído (P003/P007) |
 | — (novo: carga inicial idempotente) | `internal/seed/*_test.go` | `internal/seed/seed_test.go` (Memory + SQLite) | Concluído (P003) |
 | — (novo: suíte de contrato parametrizada) | `tests/contract/*_test.go` | `tests/contract/contratos_test.go`, `memory_test.go`, `sqlite_test.go` | Concluído (P003) |
-| — (novo: rotas REST e erros HTTP) | `internal/adapters/http/*_test.go` | `internal/adapters/http/router_test.go` (httptest cobrindo todas as rotas e códigos de erro) | Concluído (P004) |
+| — (novo: rotas REST, handlers desacoplados e segurança) | `internal/adapters/http/*_test.go` | `internal/adapters/http/router_test.go` (httptest cobrindo rotas, erros, 413 corpo grande e mesma conta) | Concluído (P004/P007) |
+| — (novo: validação e segurança no domínio) | `domain/cliente/*_test.go` | `internal/domain/cliente/cliente_security_test.go`, `cliente_test.go` | Concluído (P007) |
 | — (novo: componentes frontend de clientes) | `frontend/src/features/clientes/*.test.jsx` | `src/features/clientes/componentes.test.jsx` (8 testes: cadastro, validação de idade, ações) | Concluído (P005) |
 | — (novo: componentes frontend de contas) | `frontend/src/features/contas/*.test.jsx` | `src/features/contas/componentes.test.jsx` (6 testes: cadastro, consulta, ações e fluxo feliz) | Concluído (P005) |
 | — (novo: integração frontend e erros MSW) | `frontend/tests/*.test.jsx` | `tests/app.test.jsx` (12 testes: navegação, acessibilidade e 6 motivos de recusa da transferência) | Concluído (P005) |
