@@ -1,12 +1,81 @@
-import { useEffect, useState } from 'react'
-import { acaoConta, cadastrarConta, consultarConta, listarContas, removerConta, transferir } from '../../api/contas.js'
-import Mensagem from '../../components/Mensagem.jsx'
+import { useEffect, useState } from "react";
+import {
+  acaoConta,
+  cadastrarConta,
+  consultarConta,
+  listarContas,
+  removerConta,
+  situacaoConta,
+  transferir,
+} from "../../api/contas.js";
+import Mensagem from "../../components/Mensagem.jsx";
+import { useMensagem } from "../../hooks/useMensagem.js";
+import CadastroConta from "./CadastroConta.jsx";
+import ConsultaConta from "./ConsultaConta.jsx";
+import ListaContas from "./ListaContas.jsx";
+import Transferencia from "./Transferencia.jsx";
+
 export default function Contas() {
- const [contas,setContas]=useState([]),[mensagem,setMensagem]=useState(''),[erro,setErro]=useState(false),[form,setForm]=useState({id:'',saldo:'',ativo:true}),[consulta,setConsulta]=useState(''),[mov,setMov]=useState({origem:'',destino:'',valor:''})
- const avisar=(t,e=false)=>{setMensagem(t);setErro(e)}; const carregar=()=>listarContas().then(setContas).catch(e=>avisar(e.message,true)); useEffect(()=>{carregar()},[])
- const cadastrar=async e=>{e.preventDefault();try{await cadastrarConta({...form,id:Number(form.id),saldo:Number(form.saldo)});avisar('Conta cadastrada.');carregar()}catch(x){avisar(x.message,true)}}
- const executar=async(id,acao)=>{try{acao==='remover'?await removerConta(id):await acaoConta(id,acao);avisar('Operação concluída.');carregar()}catch(x){avisar(x.message,true)}}
- const consultar=async e=>{e.preventDefault();try{const c=await consultarConta(consulta);avisar(`Conta ${c.id}: ${c.saldo} — ${c.situacao}`)}catch(x){avisar(x.message,true)}}
- const mover=async e=>{e.preventDefault();try{await transferir({origem:Number(mov.origem),destino:Number(mov.destino),valor:Number(mov.valor)});avisar('Transferência realizada.');carregar()}catch(x){avisar(x.message,true)}}
- return <section><h2>Contas correntes</h2><Mensagem texto={mensagem} erro={erro}/><form onSubmit={consultar}><h3>Consultar conta</h3><label>ID para consulta<input type="number" value={consulta} onChange={e=>setConsulta(e.target.value)} required/></label><button>Consultar conta</button></form><form onSubmit={cadastrar}><h3>Cadastrar conta</h3><label>ID<input aria-label="ID da conta" type="number" value={form.id} onChange={e=>setForm({...form,id:e.target.value})} required/></label><label>Saldo<input type="number" step="0.01" value={form.saldo} onChange={e=>setForm({...form,saldo:e.target.value})} required/></label><label>Ativa<input type="checkbox" checked={form.ativo} onChange={e=>setForm({...form,ativo:e.target.checked})}/></label><button>Cadastrar conta</button></form><h3>Lista de contas</h3><ul>{contas.map(c=><li key={c.id}>Conta {c.id}: {c.saldo} — {c.situacao} <button onClick={()=>executar(c.id,'ativar')}>Ativar conta</button><button onClick={()=>executar(c.id,'desativar')}>Desativar conta</button><button onClick={()=>executar(c.id,'remover')}>Remover conta</button></li>)}</ul><form onSubmit={mover}><h3>Transferir valores</h3><label>Conta de origem<input type="number" value={mov.origem} onChange={e=>setMov({...mov,origem:e.target.value})} required/></label><label>Conta de destino<input type="number" value={mov.destino} onChange={e=>setMov({...mov,destino:e.target.value})} required/></label><label>Valor<input type="number" step="0.01" value={mov.valor} onChange={e=>setMov({...mov,valor:e.target.value})} required/></label><button>Transferir</button></form></section>
+  const [contas, setContas] = useState([]);
+  const { mensagem, erro, avisar } = useMensagem();
+  async function carregar() {
+    try {
+      setContas(await listarContas());
+    } catch (e) {
+      avisar(e.message, true);
+    }
+  }
+  useEffect(() => {
+    carregar();
+  }, []);
+  async function cadastrar(dados) {
+    try {
+      await cadastrarConta(dados);
+      avisar("Conta cadastrada.");
+      carregar();
+    } catch (e) {
+      avisar(e.message, true);
+    }
+  }
+  async function consultar(id) {
+    try {
+      const conta = await consultarConta(id);
+      avisar(`Conta ${conta.id}: ${conta.saldo} — ${conta.situacao}`);
+    } catch (e) {
+      avisar(e.message, true);
+    }
+  }
+  async function executar(id, acao) {
+    try {
+      if (acao === "remover") await removerConta(id);
+      else if (acao === "situacao") {
+        const resultado = await situacaoConta(id);
+        avisar(`Situação: ${resultado.situacao}`);
+        return;
+      } else await acaoConta(id, acao);
+      avisar("Operação concluída.");
+      carregar();
+    } catch (e) {
+      avisar(e.message, true);
+    }
+  }
+  async function mover(dados) {
+    try {
+      await transferir(dados);
+      avisar("Transferência realizada.");
+      carregar();
+    } catch (e) {
+      avisar(e.message, true);
+    }
+  }
+  return (
+    <section>
+      <h2>Contas correntes</h2>
+      <Mensagem texto={mensagem} erro={erro} />
+      <ConsultaConta onConsultar={consultar} />
+      <CadastroConta onCadastrar={cadastrar} />
+      <ListaContas contas={contas} onAcao={executar} />
+      <Transferencia onTransferir={mover} />
+    </section>
+  );
 }
