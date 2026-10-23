@@ -1,0 +1,26 @@
+# Go
+/backend/bin/
+*.test
+*.out
+coverage*.html
+
+# SQLite
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Node / Vite
+node_modules/
+/frontend/dist/
+/frontend/coverage/
+/e2e/test-results/
+/e2e/playwright-report/
+
+# Ambiente / editores
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+.vscode/
