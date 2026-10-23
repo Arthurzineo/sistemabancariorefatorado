@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import CadastroCliente from "./CadastroCliente.jsx";
 import ConsultaCliente from "./ConsultaCliente.jsx";
 import ValidacaoIdade from "./ValidacaoIdade.jsx";
@@ -29,5 +30,17 @@ describe("componentes de clientes", () => {
     expect(
       screen.getByRole("button", { name: "Desativar" }),
     ).toBeInTheDocument();
+  });
+
+  it("dispara ativar, desativar e remover", async () => {
+    const user = userEvent.setup();
+    const acao = vi.fn();
+    render(<AcoesCliente onAcao={acao} />);
+    await user.click(screen.getByRole("button", { name: "Ativar" }));
+    await user.click(screen.getByRole("button", { name: "Desativar" }));
+    await user.click(screen.getByRole("button", { name: "Remover" }));
+    expect(acao).toHaveBeenNthCalledWith(1, "ativar");
+    expect(acao).toHaveBeenNthCalledWith(2, "desativar");
+    expect(acao).toHaveBeenNthCalledWith(3, "remover");
   });
 });
