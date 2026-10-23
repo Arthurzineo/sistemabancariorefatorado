@@ -1,6 +1,6 @@
 # Sistema Bancário Refatorado
 
-> Aplicação web cliente-servidor para gerenciamento bancário e transferências atômicas, refatorada a partir de um sistema de console em Java 8. Desenvolvida integralmente com metodologias ágeis de engenharia de software (**TDD**, **BDD**, **DDD**, **Clean Architecture** e **Arquitetura Hexagonal**) e orquestrada por uma equipe de agentes autônomos de Inteligência Artificial sob o protocolo **ORCA**.
+> Aplicação web cliente-servidor para gerenciamento bancário e transferências atômicas, refatorada a partir de um sistema de console em Java 8. Desenvolvida com metodologias de engenharia de software (**TDD**, **BDD**, **DDD**, **Clean Architecture** e **Arquitetura Hexagonal**) e coordenada pelo usuário com o protocolo **ORCA**.
 
 ---
 
@@ -8,12 +8,14 @@
 
 O objetivo principal deste projeto é modernizar a arquitetura e a experiência de uso de um sistema bancário legado, originalmente implementado em Java 8 como aplicação de console monolítica, transformando-o em uma aplicação cliente-servidor distribuída:
 
-- **Backend:** Desenvolvido em **Go 1.25** adotando arquitetura hexagonal (*ports & adapters*) e princípios de MVC, sem frameworks pesados de terceiros, priorizando concisão, concorrência segura e compilação estática.
-- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+), componentização estrita por responsabilidade e foco em acessibilidade e fidelidade visual.
-- **Persistência de Dados:** Base relacional **SQLite** acessada via Data Access Object (DAO) utilizando driver puro Go (`modernc.org/sqlite v1.58.0`, sem necessidade de CGO), acompanhada de adaptador em memória de alta performance para testes.
-- **Transacionalidade e Atomicidade:** Operações de transferência atômica com reversão integral (*rollback*) em caso de falhas, respaldadas pelo padrão *Unit of Work*.
+- **Backend:** Desenvolvido em **Go 1.25** adotando arquitetura hexagonal (*ports & adapters*) e princípios de MVC, sem frameworks pesados de roteamento, priorizando concisão e compilação estática.
+- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+) sem TypeScript ([ADR-004](docs/decisoes.md#adr-004)), componentização estrita por responsabilidade ([ADR-017](docs/decisoes.md#adr-017)) e foco em acessibilidade.
+- **Persistência de Dados:** Base relacional **SQLite** acessada via Data Access Object (DAO) utilizando driver puro Go (`modernc.org/sqlite v1.58.0`, sem necessidade de CGO, [ADR-005](docs/decisoes.md#adr-005), [ADR-015](docs/decisoes.md#adr-015)), acompanhada de adaptador em memória (`memory`) com clonagem defensiva para testes rápidos.
+- **Transacionalidade e Atomicidade:** Operações de transferência atômica com reversão integral (*rollback*) em caso de falhas, coordenadas pelo padrão *Unit of Work*.
 - **Infraestrutura e Orquestração:** Empacotamento em **2 containers Docker** orquestrados por `docker compose`, executando como usuários de sistema sem privilégios de root (`app`, `uid=100`) em rede interna isolada `banco-net`.
-- **Rastreabilidade e Paridade de Domínio:** 100% de conformidade com os requisitos de negócio e testes legados (55 testes JUnit e 15 cenários BDD originais), garantindo limites precisos de idade (18 a 65 anos inclusivo), validação de saldos finitos e códigos de erro tipados na API REST.
+- **Regras e Testes Portados do Original:** As regras de negócio e os testes do sistema legado Java 8 (`../SistemaBancario_entrega/SistemaBancario`, mantido como especificação somente leitura) foram portados e validados no backend e frontend:
+  - 55 testes JUnit originais → portados para testes unitários em `backend/internal/domain/`, testes de contrato em `backend/tests/contract/` e testes HTTP em `backend/internal/adapters/http/`.
+  - 15 cenários BDD originais + 2 cenários adicionais para contas inativas ([ADR-011](docs/decisoes.md#adr-011)) → portados para `backend/features/` e executados via `godog` em `backend/tests/bdd/`.
 
 ---
 
@@ -51,7 +53,7 @@ A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a s
 │                                            │ Invoca casos de uso                       │
 │  [Application Services]                    ▼                                           │
 │  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │ ClienteServico  |  ContaServico (Transferência com Unit of Work)                │  │
+│  │ cliente.Servico  |  conta.Servico (Transferência com Unit of Work)               │  │
 │  └─────────────────────────────────────────┬────────────────────────────────────────┘  │
 │                                            │ Orquestra regras                          │
 │  [Domain Entities & Rules]                 ▼                                           │
@@ -61,8 +63,9 @@ A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a s
 │                                            │ Utiliza portas                            │
 │  [Ports & Driven Adapters]                 ▼                                           │
 │  ┌───────────────────────────────┬──────────────────────────────────────────────────┐  │
-│  │ Interfaces de Repositório     │ SQLite DAO Adapter (modernc.org/sqlite v1.58.0)  │  │
-│  │ e UnitOfWork                  │ Memory DAO Adapter (com cópias defensivas)       │  │
+│  │ backend/internal/application/ │ SQLite DAO Adapter (modernc.org/sqlite v1.58.0)  │  │
+│  │ ports (ClienteRepository,     │ Memory DAO Adapter (com cópias defensivas)       │  │
+│  │ ContaRepository, UnitOfWork)  │                                                  │  │
 │  └───────────────────────────────┴──────────────────────────┬───────────────────────┘  │
 └─────────────────────────────────────────────────────────────┼──────────────────────────┘
                                                               │ Grava dados
@@ -74,22 +77,22 @@ A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a s
 ```
 
 ### 2.1 Backend em Go (`backend/`)
-- **`internal/domain/`:** Entidades puras de domínio (`cliente`, `conta`), regras invariantes (idade válida entre 18 e 65 anos, saldo sempre finito em `float64`), erros tipados de transferência (`saldo_insuficiente`, `valor_invalido`, `conta_origem_nao_encontrada`, `conta_destino_nao_encontrada`, `conta_origem_inativa`, `conta_destino_inativa`) e validações de unicidade.
-- **`internal/ports/`:** Contratos de abstração de dados (`ClienteRepositorio`, `ContaRepositorio`) e controle transacional (`UnitOfWork`).
-- **`internal/application/`:** Serviços de aplicação (`ClienteServico` e `ContaServico`), organizados por contexto delimitado ([ADR-016](docs/decisoes.md#adr-016)). Implementam os casos de uso de negócio e coordenam transações atômicas de transferência.
+- **`internal/domain/`:** Entidades de domínio (`cliente`, `conta`), regras invariantes (idade válida entre 18 e 65 anos, saldo sempre finito em `float64`), erros tipados de transferência (`saldo_insuficiente`, `valor_invalido`, `conta_origem_nao_encontrada`, `conta_destino_nao_encontrada`, `conta_origem_inativa`, `conta_destino_inativa`) e validações de unicidade.
+- **`internal/application/ports/`:** Contratos de abstração de dados (`ClienteRepository`, `ContaRepository`) e controle transacional (`UnitOfWork`).
+- **`internal/application/`:** Serviços de aplicação (`cliente.Servico` e `conta.Servico`), organizados por contexto delimitado ([ADR-016](docs/decisoes.md#adr-016)). Implementam os casos de uso de negócio e coordenam transações atômicas de transferência.
 - **`internal/adapters/sqlite/`:** Adaptador de persistência durável em SQLite com operações preparadas e controle transacional (`BEGIN`, `COMMIT`, `ROLLBACK`).
 - **`internal/adapters/memory/`:** Adaptador em memória com cópias defensivas (`Copia()`) para isolamento estrito de referências em suítes de teste de unidade.
-- **`internal/adapters/http/`:** Controlador HTTP construído com roteamento nativo do Go 1.22 (`net/http`), mapeamento JSON estrito e conversão de erros de domínio em códigos de status HTTP sem vazamento de abstração.
+- **`internal/adapters/http/`:** Controlador HTTP construído com roteamento nativo do Go 1.22 (`net/http`), mapeamento JSON e conversão de erros de domínio em códigos de status HTTP sem vazamento de abstração.
 - **`internal/seed/`:** Carga inicial idempotente de dados (clientes e contas padrão).
 - **`cmd/api/main.go`:** Ponto de entrada (*composition root*) com graceful shutdown de 5 segundos via sinais `SIGINT`/`SIGTERM`.
 
 ### 2.2 Frontend em React (`frontend/`)
 - **`src/features/clientes/`:** Componentes independentes para consulta, cadastro com validação de idade (18 a 65 anos) e listagem/gerenciamento de clientes.
 - **`src/features/contas/`:** Componentes desacoplados para consulta de saldo, cadastro de conta, gerenciamento de situação (ativa/inativa) e formulário transacional de transferência.
-- **`src/hooks/useMensagem.js`:** Hook customizado compartilhado para controle de feedbacks visuais, mensagens de erro e sucesso com auto-dismiss.
-- **`src/components/Mensagem.jsx`:** Componente de alerta com semântica de acessibilidade (`role="alert"` e `aria-live`).
-- **`tests/`:** Suíte completa de testes de componentes e integração utilizando **Vitest**, **React Testing Library** e **Mock Service Worker (MSW)**.
-- **`e2e/`:** Testes ponta a ponta reais com **Playwright** executando contra o ambiente conteinerizado.
+- **`src/hooks/useMensagem.js`:** Hook para gerenciar estado local de feedback (`mensagem`, flag booleana `erro` e função `avisar(texto, falhou)`).
+- **`src/components/Mensagem.jsx`:** Componente de alerta que renderiza `<p role={erro ? "alert" : "status"}>{texto}</p>` quando há mensagem definida.
+- **`src/features/*/componentes.test.jsx` e `tests/app.test.jsx`:** Suíte completa de testes de componentes e integração utilizando **Vitest**, **React Testing Library** e **Mock Service Worker (MSW)** cobrindo renderização, formulários, ações de tela e tratamento de erros tipados da API.
+- **`e2e/fluxo-bancario.spec.js`:** Testes ponta a ponta reais com **Playwright** executando contra o ambiente conteinerizado.
 
 ---
 
@@ -189,28 +192,38 @@ Todos os requisitos funcionais originais do sistema bancário (R01 a R12) e as e
 
 ## 6. Desenvolvimento com Inteligência Artificial e Metodologia Multi-Agente (ORCA)
 
-Este projeto foi conduzido inteiramente sob o modelo colaborativo de engenharia de software **ORCA (Open Repository Coordination for Agents)**, demonstrando como equipes especializadas de agentes de Inteligência Artificial podem operar com autonomia supervisionada, separação rigorosa de papéis e governança formal:
+Este projeto foi conduzido por uma equipe de agentes autônomos de Inteligência Artificial coordenada pelo usuário através do protocolo **ORCA**:
 
 ### 6.1 Papéis e Especialização da Equipe
 - **Chief Architect / Coordinator (`claude` — Claude Opus 5.5):** Responsável pela arquitetura do sistema, planejamento de fases (P001 a P007), elaboração dos contratos de trabalho, supervisão contínua do ciclo de entrega, decisões de ADR e merge final dos Pull Requests.
-- **Software Engineer / Implementer (`codex` — GPT-5):** Responsável pela codificação do backend em Go, suítes TDD, cenários BDD em `godog`, frontend React/Vite, Dockerfiles e testes Playwright E2E. Operou estritamente sob ciclos de commit TDD (`test: RED`, `feat: GREEN`, `refactor`).
-- **Tester & Code Reviewer (`agy` — Gemini 2.5 Pro):** Revisor independente atuando em worktree isolado. Conduziu análises estáticas e dinâmicas, validação estrita de critérios de aceite contra commits do branch e aplicação de bloqueios rigorosos (`CHANGES_REQUESTED`) perante inconsistências.
-- **Documentarian & Summarizer (`agy-doc` — Gemini 2.5 Pro):** Responsável pela rastreabilidade bidirecional contínua, auditoria de conformidade entre código e especificação, manutenção do grafo de conhecimento (Graphify), síntese do projeto (`SUMMARY.md`), catálogo de lições aprendidas (`LESSONS_LEARNED.md`) e redação da documentação final de entrega.
+- **Software Engineer / Implementer (`codex` — gpt-5.6-terra e posteriormente gpt-5.6-luna, alternado por limite de uso):** Responsável pela codificação do backend em Go, suítes de teste, cenários BDD em `godog`, frontend React/Vite, Dockerfiles e testes Playwright E2E.
+- **Tester & Code Reviewer (`agy` — Antigravity CLI com Gemini 4 Argon / Gemini 3.8 Flash):** Revisor independente atuando em worktree isolado. Conduziu análises estáticas e dinâmicas, validação de critérios de aceite contra commits do branch e aplicação de pedidos de alteração (`CHANGES_REQUESTED`) perante inconsistências.
+- **Documentarian & Summarizer (`agy-doc` — Antigravity CLI com Gemini 4 Argon / Gemini 3.8 Flash):** Responsável pela rastreabilidade contínua, auditoria de conformidade entre código e documentação, manutenção do grafo de conhecimento (Graphify), síntese do projeto (`SUMMARY.md`), catálogo de lições aprendidas (`LESSONS_LEARNED.md`) e documentação final de entrega.
 
 ### 6.2 Disciplina e Rastreabilidade do TDD no Histórico Git
-Conforme estipulado no [ADR-008](docs/decisoes.md#adr-008), a comprovação da metodologia de Test-Driven Development não se baseia em relatórios declaratórios, mas sim na evidência concreta e auditável do histórico de commits do repositório:
+Conforme estipulado no [ADR-008](docs/decisoes.md#adr-008), a evidência do desenvolvimento guiado por testes baseia-se no histórico auditável de commits do repositório:
 - Commits `test: RED`: Introduzem testes automatizados com falha antes da implementação do recurso.
-- Commits `feat: GREEN`: Fornecem a implementação funcional mínima suficiente para aprovação dos testes.
+- Commits `feat: GREEN`: Fornecem a implementação funcional mínima para aprovação dos testes.
 - Commits `refactor`: Limpam e organizam a base preservando o comportamento observável.
+
+A maior parte das funcionalidades seguiu a alternância RED → GREEN. Conforme apontado nas revisões de código e registrado nas lições aprendidas (L-006), alguns commits de rotas e composição entraram sem commit RED predecessor (`be26f9d`, `afe8128`, `1ef9896`, `d682c9e` na fase P004 e `cce754d` na fase P005), tendo suas coberturas de teste consolidadas em commits subsequentes.
 
 ---
 
-## 7. Documentação Técnica Detalhada
+## 7. Limitações Conhecidas
+
+- **Ponto flutuante para valores monetários (`float64`):** Mantido por paridade com o sistema original em Java ([ADR-003](docs/decisoes.md#adr-003)). Embora salvaguardas de saldo finito (`math.IsNaN`, `math.IsInf`) tenham sido implementadas para rejeitar estouros numéricos, o tipo não substitui tipos decimais de precisão arbitrária recomendados para sistemas bancários de grande escala.
+- **Mensagens de erro do backend sem acentuação:** As mensagens textuais de erro retornadas pela API REST em Go não possuem acentuação gráfica (por exemplo: `"cliente nao encontrado"`, `"conta nao encontrada"` ou `"identificador duplicado"`), embora os códigos de status HTTP e os identificadores JSON sejam estruturados e consistentes.
+- **Ausência de autenticação e controle de acesso:** O sistema não implementa autenticação (tokens/sessões) ou perfis de autorização, uma vez que tais controles estavam fora do escopo do sistema de console legado.
+
+---
+
+## 8. Documentação Técnica Detalhada
 
 A pasta [`docs/`](docs/) contém o conjunto integral de especificações técnicas do projeto:
 
 - [`docs/requisitos.md`](docs/requisitos.md): Detalhamento formal dos requisitos de negócio (R01 a R12), regras não funcionais e dados iniciais de seed.
-- [`docs/arquitetura.md`](docs/arquitetura.md): Desenho arquitetural do backend hexagonal, frontend componentizado, padrões de projeto e diagrama C4.
+- [`docs/arquitetura.md`](docs/arquitetura.md): Desenho arquitetural do backend hexagonal, frontend componentizado e padrões de projeto.
 - [`docs/decisoes.md`](docs/decisoes.md): Catálogo completo das 17 Decisões Arquiteturais registradas (ADR-001 a ADR-017).
 - [`docs/api.md`](docs/api.md): Especificação completa dos contratos HTTP REST, payloads de entrada/saída e códigos de erro tipados.
 - [`docs/infra-docker.md`](docs/infra-docker.md): Especificação dos containers multi-stage, topologia de rede, healthcheck e persistência.
