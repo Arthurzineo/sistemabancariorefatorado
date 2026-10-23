@@ -67,3 +67,11 @@ func (s *Servico) Transferir(origemID, destinoID int, valor float64) error {
 	}
 	return domain.Transferir(origem, destino, valor)
 }
+
+func (s *Servico) Situacao(id int) (domain.Situacao, error) {
+	c, err := s.Consultar(id)
+	if err != nil {
+		return "", err
+	}
+	return c.Situacao(), nil
+}

@@ -63,3 +63,5 @@ func (s *Servico) Situacao(id int) (domain.Situacao, error) {
 	}
 	return c.Situacao(), nil
 }
+
+func (s *Servico) IdadePermitida(idade int) bool { return domain.IdadePermitida(idade) }

@@ -23,5 +23,7 @@ func TestSituacaoDistingueClienteInexistenteDeInativo(t *testing.T) {
 
 func TestValidarIdade(t *testing.T) {
 	s := app.NovoServico(memory.NovoClienteRepositorio())
-	if !s.IdadePermitida(18) || s.IdadePermitida(66) { t.Fatal("regra de idade incorreta") }
+	if !s.IdadePermitida(18) || s.IdadePermitida(66) {
+		t.Fatal("regra de idade incorreta")
+	}
 }
