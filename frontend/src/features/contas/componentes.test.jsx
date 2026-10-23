@@ -5,6 +5,7 @@ import CadastroConta from "./CadastroConta.jsx";
 import ConsultaConta from "./ConsultaConta.jsx";
 import ListaContas from "./ListaContas.jsx";
 import Transferencia from "./Transferencia.jsx";
+import Contas from "./Contas.jsx";
 
 describe("componentes de contas", () => {
   it("oferece formulários e ações acessíveis", () => {
@@ -43,5 +44,16 @@ describe("componentes de contas", () => {
     expect(acao).toHaveBeenNthCalledWith(1, 1, "ativar");
     expect(acao).toHaveBeenNthCalledWith(2, 1, "desativar");
     expect(acao).toHaveBeenNthCalledWith(3, 1, "remover");
+  });
+
+  it("carrega a lista e executa ações da conta", async () => {
+    const user = userEvent.setup();
+    render(<Contas />);
+    expect(await screen.findByText(/Conta 1: 100/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Ativar conta" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Operação concluída");
+    await user.click(screen.getByRole("button", { name: "Desativar conta" }));
+    await user.click(screen.getByRole("button", { name: "Ver situação da conta" }));
+    await user.click(screen.getByRole("button", { name: "Remover conta" }));
   });
 });

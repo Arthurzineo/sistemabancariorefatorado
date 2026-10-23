@@ -6,6 +6,7 @@ import ConsultaCliente from "./ConsultaCliente.jsx";
 import ValidacaoIdade from "./ValidacaoIdade.jsx";
 import ListaClientes from "./ListaClientes.jsx";
 import AcoesCliente from "./AcoesCliente.jsx";
+import Clientes from "./Clientes.jsx";
 
 describe("componentes de clientes", () => {
   it("oferece campos e ações acessíveis", () => {
@@ -42,5 +43,16 @@ describe("componentes de clientes", () => {
     expect(acao).toHaveBeenNthCalledWith(1, "ativar");
     expect(acao).toHaveBeenNthCalledWith(2, "desativar");
     expect(acao).toHaveBeenNthCalledWith(3, "remover");
+  });
+
+  it("carrega a lista e executa ativar, desativar, situação e remoção", async () => {
+    const user = userEvent.setup();
+    render(<Clientes />);
+    expect(await screen.findByText("Ana")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Ativar" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Operação concluída");
+    await user.click(screen.getByRole("button", { name: "Desativar" }));
+    await user.click(screen.getByRole("button", { name: "Ver situação" }));
+    await user.click(screen.getByRole("button", { name: "Remover" }));
   });
 });
