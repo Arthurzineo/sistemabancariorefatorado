@@ -1,13 +1,217 @@
 # Sistema Bancário Refatorado
 
-Refatoração do Sistema Bancário de console (Java) para uma aplicação cliente-servidor:
+> Aplicação web cliente-servidor para gerenciamento bancário e transferências atômicas, refatorada a partir de um sistema de console em Java 8. Desenvolvida integralmente com metodologias ágeis de engenharia de software (**TDD**, **BDD**, **DDD**, **Clean Architecture** e **Arquitetura Hexagonal**) e orquestrada por uma equipe de agentes autônomos de Inteligência Artificial sob o protocolo **ORCA**.
 
-- **backend/** — Go, arquitetura hexagonal + MVC, SQLite atrás de adapter DAO
-- **frontend/** — React + Vite
-- **docker-compose.yml** — 2 containers (frontend nginx + backend Go) numa rede Docker
+---
 
-Desenvolvimento guiado por **TDD, BDD e DDD**. A evidência do TDD está no histórico de commits
-(`test(Rxx): RED`, `feat(Rxx): GREEN`, `refactor(Rxx)`).
+## 1. Visão Geral do Projeto
 
-> Em construção. A documentação de requisitos, arquitetura e plano fica no projeto ORCA
-> que contém esta pasta (`../docs/`, `../.orca/`).
+O objetivo principal deste projeto é modernizar a arquitetura e a experiência de uso de um sistema bancário legado, originalmente implementado em Java 8 como aplicação de console monolítica, transformando-o em uma aplicação cliente-servidor distribuída:
+
+- **Backend:** Desenvolvido em **Go 1.25** adotando arquitetura hexagonal (*ports & adapters*) e princípios de MVC, sem frameworks pesados de terceiros, priorizando concisão, concorrência segura e compilação estática.
+- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+), componentização estrita por responsabilidade e foco em acessibilidade e fidelidade visual.
+- **Persistência de Dados:** Base relacional **SQLite** acessada via Data Access Object (DAO) utilizando driver puro Go (`modernc.org/sqlite v1.58.0`, sem necessidade de CGO), acompanhada de adaptador em memória de alta performance para testes.
+- **Transacionalidade e Atomicidade:** Operações de transferência atômica com reversão integral (*rollback*) em caso de falhas, respaldadas pelo padrão *Unit of Work*.
+- **Infraestrutura e Orquestração:** Empacotamento em **2 containers Docker** orquestrados por `docker compose`, executando como usuários de sistema sem privilégios de root (`app`, `uid=100`) em rede interna isolada `banco-net`.
+- **Rastreabilidade e Paridade de Domínio:** 100% de conformidade com os requisitos de negócio e testes legados (55 testes JUnit e 15 cenários BDD originais), garantindo limites precisos de idade (18 a 65 anos inclusivo), validação de saldos finitos e códigos de erro tipados na API REST.
+
+---
+
+## 2. Arquitetura do Sistema
+
+A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a semântica **MVC**:
+
+```
+                              ┌────────────────────────────────────────┐
+                              │            Navegador Web               │
+                              │       http://localhost:3000            │
+                              └──────────────────┬─────────────────────┘
+                                                 │
+                                                 │ HTTP
+                                                 ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ Container Frontend (nginx:1.29-alpine — uid 100)                                       │
+│                                                                                        │
+│   ┌───────────────────────────┐         ┌──────────────────────────────────────────┐   │
+│   │   SPA React 19 (Vite)     │ ──────> │              Nginx Proxy                 │   │
+│   │   Assets estáticos HTML/JS│         │   proxy_pass http://backend:8080/api/    │   │
+│   └───────────────────────────┘         └────────────────────┬─────────────────────┘   │
+└──────────────────────────────────────────────────────────────┼─────────────────────────┘
+                                                               │ Rede bridge (banco-net)
+                                                               │ (porta 8080 interna)
+                                                               ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ Container Backend (alpine:3.22 com binário estático Go — uid 100)                      │
+│                                                                                        │
+│  [Adapters - Driving]                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ HTTP Controller (net/http Go 1.22+)                                              │  │
+│  │ /api/health  |  /api/clientes  |  /api/contas  |  /api/transferencias             │  │
+│  └─────────────────────────────────────────┬────────────────────────────────────────┘  │
+│                                            │ Invoca casos de uso                       │
+│  [Application Services]                    ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ ClienteServico  |  ContaServico (Transferência com Unit of Work)                │  │
+│  └─────────────────────────────────────────┬────────────────────────────────────────┘  │
+│                                            │ Orquestra regras                          │
+│  [Domain Entities & Rules]                 ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ Cliente (Idade 18-65) | ContaCorrente (Saldo Finito) | Transferencia (Atomicidade)│  │
+│  └─────────────────────────────────────────┬────────────────────────────────────────┘  │
+│                                            │ Utiliza portas                            │
+│  [Ports & Driven Adapters]                 ▼                                           │
+│  ┌───────────────────────────────┬──────────────────────────────────────────────────┐  │
+│  │ Interfaces de Repositório     │ SQLite DAO Adapter (modernc.org/sqlite v1.58.0)  │  │
+│  │ e UnitOfWork                  │ Memory DAO Adapter (com cópias defensivas)       │  │
+│  └───────────────────────────────┴──────────────────────────┬───────────────────────┘  │
+└─────────────────────────────────────────────────────────────┼──────────────────────────┘
+                                                              │ Grava dados
+                                                              ▼
+                                            ┌──────────────────────────────────┐
+                                            │ Volume Persistente (banco-data)  │
+                                            │ Arquivo SQLite: /data/banco.db   │
+                                            └──────────────────────────────────┘
+```
+
+### 2.1 Backend em Go (`backend/`)
+- **`internal/domain/`:** Entidades puras de domínio (`cliente`, `conta`), regras invariantes (idade válida entre 18 e 65 anos, saldo sempre finito em `float64`), erros tipados de transferência (`saldo_insuficiente`, `valor_invalido`, `conta_origem_nao_encontrada`, `conta_destino_nao_encontrada`, `conta_origem_inativa`, `conta_destino_inativa`) e validações de unicidade.
+- **`internal/ports/`:** Contratos de abstração de dados (`ClienteRepositorio`, `ContaRepositorio`) e controle transacional (`UnitOfWork`).
+- **`internal/application/`:** Serviços de aplicação (`ClienteServico` e `ContaServico`), organizados por contexto delimitado ([ADR-016](docs/decisoes.md#adr-016)). Implementam os casos de uso de negócio e coordenam transações atômicas de transferência.
+- **`internal/adapters/sqlite/`:** Adaptador de persistência durável em SQLite com operações preparadas e controle transacional (`BEGIN`, `COMMIT`, `ROLLBACK`).
+- **`internal/adapters/memory/`:** Adaptador em memória com cópias defensivas (`Copia()`) para isolamento estrito de referências em suítes de teste de unidade.
+- **`internal/adapters/http/`:** Controlador HTTP construído com roteamento nativo do Go 1.22 (`net/http`), mapeamento JSON estrito e conversão de erros de domínio em códigos de status HTTP sem vazamento de abstração.
+- **`internal/seed/`:** Carga inicial idempotente de dados (clientes e contas padrão).
+- **`cmd/api/main.go`:** Ponto de entrada (*composition root*) com graceful shutdown de 5 segundos via sinais `SIGINT`/`SIGTERM`.
+
+### 2.2 Frontend em React (`frontend/`)
+- **`src/features/clientes/`:** Componentes independentes para consulta, cadastro com validação de idade (18 a 65 anos) e listagem/gerenciamento de clientes.
+- **`src/features/contas/`:** Componentes desacoplados para consulta de saldo, cadastro de conta, gerenciamento de situação (ativa/inativa) e formulário transacional de transferência.
+- **`src/hooks/useMensagem.js`:** Hook customizado compartilhado para controle de feedbacks visuais, mensagens de erro e sucesso com auto-dismiss.
+- **`src/components/Mensagem.jsx`:** Componente de alerta com semântica de acessibilidade (`role="alert"` e `aria-live`).
+- **`tests/`:** Suíte completa de testes de componentes e integração utilizando **Vitest**, **React Testing Library** e **Mock Service Worker (MSW)**.
+- **`e2e/`:** Testes ponta a ponta reais com **Playwright** executando contra o ambiente conteinerizado.
+
+---
+
+## 3. Como Executar a Aplicação
+
+### 3.1 Pré-requisitos
+- **Docker** e **Docker Compose** instalados na máquina.
+
+### 3.2 Inicialização com Docker Compose
+Para compilar as imagens e iniciar os serviços em segundo plano:
+
+```bash
+docker compose up --build
+```
+
+> **Dica para ambiente Linux:** Se o seu usuário foi adicionado recentemente ao grupo `docker` e a sessão de terminal atual ainda não foi renovada, execute:
+> ```bash
+> sg docker -c "docker compose up --build"
+> ```
+
+### 3.3 Acesso aos Serviços
+- **Aplicação Web (Interface do Usuário):** [http://localhost:3000](http://localhost:3000)
+- **Endpoint de Saúde (Healthcheck via Nginx):** [http://localhost:3000/api/health](http://localhost:3000/api/health)
+- **API REST (Clientes):** [http://localhost:3000/api/clientes](http://localhost:3000/api/clientes)
+- **API REST (Contas):** [http://localhost:3000/api/contas](http://localhost:3000/api/contas)
+
+*Nota de Segurança:* Por arquitetura, a porta `8080` do backend não é publicada no computador hospedeiro (*host*). O backend comunica-se exclusivamente com o Nginx através da rede interna `banco-net`.
+
+### 3.4 Encerramento dos Containers
+Para interromper os containers preservando os dados cadastrados:
+```bash
+docker compose down
+```
+
+Para interromper e **limpar o volume de dados** (`banco-data`), reiniciando o banco a partir do seed original:
+```bash
+docker compose down -v
+```
+
+---
+
+## 4. Como Executar os Testes
+
+O projeto conta com suítes de teste automatizadas cobrindo todos os níveis da pirâmide de testes.
+
+### 4.1 Testes do Backend (Unidade, Contratos e HTTP)
+Executa a suíte de testes unitários do domínio, testes de conformidade de contrato entre repositórios SQLite/Memória e testes de integração HTTP via `httptest`:
+```bash
+cd backend
+go test -v ./...
+```
+
+### 4.2 Testes de BDD (Gherkin em Português)
+Executa os 17 cenários de teste orientados a comportamento (Behavior-Driven Development) utilizando `godog`:
+```bash
+cd backend
+go test -v ./tests/bdd
+```
+
+### 4.3 Testes do Frontend (Vitest + RTL + MSW)
+Executa os 26 testes de comportamento e renderização de componentes de interface com mocks de rede MSW:
+```bash
+cd frontend
+npm test
+```
+
+### 4.4 Testes Ponta a Ponta (Playwright E2E)
+Executa o fluxo completo de ponta a ponta no navegador contra os containers ativos em `http://localhost:3000`:
+```bash
+# Certifique-se de que a aplicação está rodando (docker compose up)
+cd frontend
+npm run e2e
+```
+
+---
+
+## 5. Matriz de Rastreabilidade (Requisito → Testes)
+
+Todos os requisitos funcionais originais do sistema bancário (R01 a R12) e as extensões acordadas foram formalmente mapeados e validados nas suítes automatizadas:
+
+| Requisito | Descrição | Testes no Backend (Go) | Testes no Frontend (Vitest/MSW) | Testes E2E (Playwright) | Status |
+|---|---|---|---|---|---|
+| **R01** | Consultar cliente por ID | `application/cliente/casos_de_uso_test.go`<br>`features/consultar_cliente.feature`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (consulta existente e 404) | — | Concluído |
+| **R02** | Cadastrar novo cliente | `application/cliente/casos_de_uso_test.go`<br>`tests/contract/contratos_test.go`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (cadastro numérico e id duplicado) | `e2e/fluxo-bancario.spec.js` (cadastro pela interface) | Concluído |
+| **R03** | Validar idade do cliente (18 a 65 anos) | `domain/cliente/cliente_test.go`<br>`application/cliente/operacoes_test.go`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (menor 18, limite 18 OK, 66 rejeitado) | — | Concluído |
+| **R04** | Ativar cliente | `domain/cliente/cliente_test.go`<br>`application/cliente/operacoes_test.go`<br>`features/ativar_cliente.feature`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (ação de ativação na listagem) | — | Concluído |
+| **R05** | Desativar cliente | `domain/cliente/cliente_test.go`<br>`application/cliente/operacoes_test.go`<br>`features/desativar_cliente.feature`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (ação de desativação na listagem) | — | Concluído |
+| **R06** | Exibir situação do cliente | `application/cliente/operacoes_test.go`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (exibição de Ativo/Inativo) | — | Concluído |
+| **R07** | Remover cliente | `application/cliente/casos_de_uso_test.go`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (ação de remoção na listagem) | — | Concluído |
+| **R08** | Consultar conta corrente por ID | `application/conta/servico_test.go`<br>`features/consultar_conta.feature`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (consulta existente e 404) | — | Concluído |
+| **R09** | Cadastrar nova conta corrente | `domain/conta/conta_test.go`<br>`application/conta/servico_test.go`<br>`tests/contract/contratos_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (cadastro numérico e id duplicado) | `e2e/fluxo-bancario.spec.js` (cadastro pela interface) | Concluído |
+| **R10** | Exibir e consultar situação da conta | `domain/conta/conta_test.go`<br>`application/conta/operacoes_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (exibição e consulta de Ativa/Inativa) | — | Concluído |
+| **R11** | Remover conta corrente | `application/conta/operacoes_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (ação de remoção na listagem) | — | Concluído |
+| **R12** | Transferir valores entre contas com atomicidade e reversão | `domain/conta/transferencia_test.go`<br>`exploratorio_test.go`<br>`application/conta/servico_test.go`<br>`transferencia_uow_test.go`<br>`features/transferir_valores.feature`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (sucesso e atualização de saldos)<br>`tests/app.test.jsx` (6 erros tipados) | `e2e/fluxo-bancario.spec.js` (transferência ponta a ponta e checagem de saldos) | Concluído |
+
+---
+
+## 6. Desenvolvimento com Inteligência Artificial e Metodologia Multi-Agente (ORCA)
+
+Este projeto foi conduzido inteiramente sob o modelo colaborativo de engenharia de software **ORCA (Open Repository Coordination for Agents)**, demonstrando como equipes especializadas de agentes de Inteligência Artificial podem operar com autonomia supervisionada, separação rigorosa de papéis e governança formal:
+
+### 6.1 Papéis e Especialização da Equipe
+- **Chief Architect / Coordinator (`claude` — Claude Opus 5.5):** Responsável pela arquitetura do sistema, planejamento de fases (P001 a P007), elaboração dos contratos de trabalho, supervisão contínua do ciclo de entrega, decisões de ADR e merge final dos Pull Requests.
+- **Software Engineer / Implementer (`codex` — GPT-5):** Responsável pela codificação do backend em Go, suítes TDD, cenários BDD em `godog`, frontend React/Vite, Dockerfiles e testes Playwright E2E. Operou estritamente sob ciclos de commit TDD (`test: RED`, `feat: GREEN`, `refactor`).
+- **Tester & Code Reviewer (`agy` — Gemini 2.5 Pro):** Revisor independente atuando em worktree isolado. Conduziu análises estáticas e dinâmicas, validação estrita de critérios de aceite contra commits do branch e aplicação de bloqueios rigorosos (`CHANGES_REQUESTED`) perante inconsistências.
+- **Documentarian & Summarizer (`agy-doc` — Gemini 2.5 Pro):** Responsável pela rastreabilidade bidirecional contínua, auditoria de conformidade entre código e especificação, manutenção do grafo de conhecimento (Graphify), síntese do projeto (`SUMMARY.md`), catálogo de lições aprendidas (`LESSONS_LEARNED.md`) e redação da documentação final de entrega.
+
+### 6.2 Disciplina e Rastreabilidade do TDD no Histórico Git
+Conforme estipulado no [ADR-008](docs/decisoes.md#adr-008), a comprovação da metodologia de Test-Driven Development não se baseia em relatórios declaratórios, mas sim na evidência concreta e auditável do histórico de commits do repositório:
+- Commits `test: RED`: Introduzem testes automatizados com falha antes da implementação do recurso.
+- Commits `feat: GREEN`: Fornecem a implementação funcional mínima suficiente para aprovação dos testes.
+- Commits `refactor`: Limpam e organizam a base preservando o comportamento observável.
+
+---
+
+## 7. Documentação Técnica Detalhada
+
+A pasta [`docs/`](docs/) contém o conjunto integral de especificações técnicas do projeto:
+
+- [`docs/requisitos.md`](docs/requisitos.md): Detalhamento formal dos requisitos de negócio (R01 a R12), regras não funcionais e dados iniciais de seed.
+- [`docs/arquitetura.md`](docs/arquitetura.md): Desenho arquitetural do backend hexagonal, frontend componentizado, padrões de projeto e diagrama C4.
+- [`docs/decisoes.md`](docs/decisoes.md): Catálogo completo das 17 Decisões Arquiteturais registradas (ADR-001 a ADR-017).
+- [`docs/api.md`](docs/api.md): Especificação completa dos contratos HTTP REST, payloads de entrada/saída e códigos de erro tipados.
+- [`docs/infra-docker.md`](docs/infra-docker.md): Especificação dos containers multi-stage, topologia de rede, healthcheck e persistência.
+- [`docs/estrategia-testes.md`](docs/estrategia-testes.md): Pirâmide de testes, cobertura por camadas e comandos de execução.
