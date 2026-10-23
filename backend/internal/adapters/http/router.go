@@ -223,9 +223,14 @@ func idDaRota(w stdhttp.ResponseWriter, r *stdhttp.Request) (int, bool) {
 		erro(w, 400, "requisicao_invalida", "id invalido")
 		return 0, false
 	}
+	if id <= 0 {
+		erro(w, 400, "requisicao_invalida", "id deve ser positivo")
+		return 0, false
+	}
 	return id, true
 }
 func decodificar(w stdhttp.ResponseWriter, r *stdhttp.Request, destino any) bool {
+	r.Body = stdhttp.MaxBytesReader(w, r.Body, 1<<20)
 	if e := json.NewDecoder(r.Body).Decode(destino); e != nil {
 		erro(w, 400, "requisicao_invalida", "JSON invalido")
 		return false
@@ -263,6 +268,14 @@ func erro(w stdhttp.ResponseWriter, status int, codigo, mensagem string) {
 func mapearErro(w stdhttp.ResponseWriter, e error) {
 	codigo, status := "erro", 422
 	switch {
+	case errors.Is(e, contadomain.ErrContaOrigemEDestinoIguais):
+		codigo, status = "contas_iguais", 422
+	case errors.Is(e, clientedomain.ErrIDInvalido), errors.Is(e, contadomain.ErrIDInvalido):
+		codigo, status = "id_invalido", 400
+	case errors.Is(e, clientedomain.ErrNomeInvalido):
+		codigo = "nome_invalido"
+	case errors.Is(e, clientedomain.ErrEmailInvalido):
+		codigo = "email_invalido"
 	case errors.Is(e, clienteapp.ErrClienteNaoEncontrado):
 		codigo, status = "cliente_nao_encontrado", 404
 	case errors.Is(e, contaapp.ErrContaNaoEncontrada):

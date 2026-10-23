@@ -12,7 +12,7 @@ func Abrir(origem string) (*Banco, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, err = db.Exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;"); err != nil {
+	if _, err = db.Exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000; PRAGMA journal_mode = WAL;"); err != nil {
 		db.Close()
 		return nil, err
 	}

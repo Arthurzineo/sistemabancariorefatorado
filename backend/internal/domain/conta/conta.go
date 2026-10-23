@@ -5,7 +5,10 @@ import (
 	"math"
 )
 
-var ErrSaldoNaoFinito = errors.New("o saldo precisa ser um numero finito")
+var (
+	ErrSaldoNaoFinito = errors.New("o saldo precisa ser um numero finito")
+	ErrIDInvalido     = errors.New("o identificador deve ser positivo")
+)
 
 type Situacao string
 
@@ -21,6 +24,9 @@ type ContaCorrente struct {
 }
 
 func Nova(id int, saldo float64, ativa bool) (*ContaCorrente, error) {
+	if id <= 0 {
+		return nil, ErrIDInvalido
+	}
 	if !finito(saldo) {
 		return nil, ErrSaldoNaoFinito
 	}

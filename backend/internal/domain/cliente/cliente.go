@@ -1,13 +1,21 @@
 package cliente
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 const (
 	IdadeMinima = 18
 	IdadeMaxima = 65
 )
 
-var ErrIdadeNaoPermitida = errors.New("a idade do cliente precisa estar entre 18 e 65 anos")
+var (
+	ErrIdadeNaoPermitida = errors.New("a idade do cliente precisa estar entre 18 e 65 anos")
+	ErrIDInvalido        = errors.New("o identificador deve ser positivo")
+	ErrNomeInvalido      = errors.New("o nome do cliente nao pode ser vazio")
+	ErrEmailInvalido     = errors.New("o email do cliente e invalido")
+)
 
 type Situacao string
 
@@ -26,6 +34,15 @@ type Cliente struct {
 }
 
 func Novo(id int, nome string, idade int, email string, idContaCorrente int, ativo bool) (*Cliente, error) {
+	if id <= 0 {
+		return nil, ErrIDInvalido
+	}
+	if strings.TrimSpace(nome) == "" {
+		return nil, ErrNomeInvalido
+	}
+	if strings.TrimSpace(email) == "" || !strings.Contains(email, "@") {
+		return nil, ErrEmailInvalido
+	}
 	if !IdadePermitida(idade) {
 		return nil, ErrIdadeNaoPermitida
 	}
