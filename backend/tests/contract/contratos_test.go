@@ -1,8 +1,8 @@
 package contract
 
 import (
-	"testing"
 	"github.com/Arthurzineo/sistemabancariorefatorado/backend/internal/application/ports"
+	"testing"
 )
 
 func executarContratoConta(t *testing.T, novoRepo func(*testing.T) ports.ContaRepository) {
