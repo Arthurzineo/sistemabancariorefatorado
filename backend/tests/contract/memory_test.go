@@ -6,8 +6,12 @@ import (
 	"testing"
 )
 
-func TestContratoContaMemory(t *testing.T) {
-	r := memory.NovoContaRepositorio()
+func TestContratoMemory(t *testing.T) {
+	executarContratoConta(t, func(t *testing.T) ports.ContaRepository { return memory.NovoContaRepositorio() })
+	executarContratoCliente(t, func(t *testing.T) ports.ClienteRepository { return memory.NovoClienteRepositorio() })
+}
+
+func executarContratoContaNoRepo(t *testing.T, r ports.ContaRepository) {
 	c, _ := conta.Nova(1, 10, true)
 	if err := r.Adicionar(c); err != nil {
 		t.Fatal(err)
