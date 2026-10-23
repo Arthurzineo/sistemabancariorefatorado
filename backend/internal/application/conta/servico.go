@@ -66,6 +66,9 @@ func (s *Servico) Desativar(id int) error {
 	return s.repositorio.Atualizar(c)
 }
 func (s *Servico) Transferir(origemID, destinoID int, valor float64) error {
+	if origemID == destinoID {
+		return domain.ErrMesmaConta
+	}
 	if s.uow == nil {
 		return errors.New("unit of work obrigatoria para transferencia")
 	}

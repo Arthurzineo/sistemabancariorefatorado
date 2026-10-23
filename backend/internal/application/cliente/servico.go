@@ -14,7 +14,9 @@ var (
 type Servico struct{ repositorio ports.ClienteRepository }
 
 func NovoServico(repositorio ports.ClienteRepository) *Servico { return &Servico{repositorio} }
-func (s *Servico) Cadastrar(id int, nome string, idade int, email string, idConta int, ativo bool) (*domain.Cliente, error) {
+func (s *Servico) Cadastrar(
+	id int, nome string, idade int, email string, idConta int, ativo bool,
+) (*domain.Cliente, error) {
 	if _, ok := s.repositorio.Buscar(id); ok {
 		return nil, ErrIDDuplicado
 	}

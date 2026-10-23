@@ -9,11 +9,13 @@ type ClienteRepositorio struct{ banco *Banco }
 
 func NovoClienteRepositorio(b *Banco) *ClienteRepositorio { return &ClienteRepositorio{b} }
 func (r *ClienteRepositorio) Adicionar(c *cliente.Cliente) error {
-	_, e := r.banco.db.Exec("INSERT INTO clientes(id,nome,idade,email,id_conta_corrente,situacao) VALUES(?,?,?,?,?,?)", c.ID(), c.Nome(), c.Idade(), c.Email(), c.IDContaCorrente(), c.Situacao())
+	const query = "INSERT INTO clientes(id,nome,idade,email,id_conta_corrente,situacao) VALUES(?,?,?,?,?,?)"
+	_, e := r.banco.db.Exec(query, c.ID(), c.Nome(), c.Idade(), c.Email(), c.IDContaCorrente(), c.Situacao())
 	return e
 }
 func (r *ClienteRepositorio) Atualizar(c *cliente.Cliente) error {
-	res, e := r.banco.db.Exec("UPDATE clientes SET nome=?,idade=?,email=?,id_conta_corrente=?,situacao=? WHERE id=?", c.Nome(), c.Idade(), c.Email(), c.IDContaCorrente(), c.Situacao(), c.ID())
+	const query = "UPDATE clientes SET nome=?,idade=?,email=?,id_conta_corrente=?,situacao=? WHERE id=?"
+	res, e := r.banco.db.Exec(query, c.Nome(), c.Idade(), c.Email(), c.IDContaCorrente(), c.Situacao(), c.ID())
 	if e != nil {
 		return e
 	}
@@ -26,7 +28,8 @@ func (r *ClienteRepositorio) Atualizar(c *cliente.Cliente) error {
 func (r *ClienteRepositorio) Buscar(id int) (*cliente.Cliente, bool) {
 	var nome, email, s string
 	var idade, conta int
-	e := r.banco.db.QueryRow("SELECT nome,idade,email,id_conta_corrente,situacao FROM clientes WHERE id=?", id).Scan(&nome, &idade, &email, &conta, &s)
+	const query = "SELECT nome,idade,email,id_conta_corrente,situacao FROM clientes WHERE id=?"
+	e := r.banco.db.QueryRow(query, id).Scan(&nome, &idade, &email, &conta, &s)
 	if e != nil {
 		return nil, false
 	}

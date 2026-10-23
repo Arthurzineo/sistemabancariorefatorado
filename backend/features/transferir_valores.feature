@@ -30,3 +30,7 @@ Funcionalidade: Transferência de valores entre contas
     Dado que a conta de id 2 está inativa
     Quando for solicitada a transferência de 40,00 da conta 1 para a conta 2
     Então a transferência deverá ser rejeitada
+  Cenário: Transferência para a mesma conta
+    Quando for solicitada a transferência de 40,00 da conta 1 para a conta 1
+    Então a transferência deverá ser rejeitada
+    E o saldo da conta 1 deverá ser 100,00
