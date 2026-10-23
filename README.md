@@ -203,7 +203,7 @@ Durante a fase de qualidade e revisões técnicas, a aplicação recebeu endurec
 
 - **Integridade Transacional (ADR-018):** Bloqueio estrito no domínio e na API de transferências entre uma conta e ela mesma (`ErrMesmaConta` → HTTP 422 `mesma_conta`), prevenindo corrupção de estado ou créditos indevidos (condição 8 do R12).
 - **Proteção contra DoS e Payloads Abusivos (ADR-019):** Limitação estrita do corpo de requisições HTTP a 1 MiB via `http.MaxBytesReader` em `json.go` (retornando HTTP 413 caso excedido).
-- **Timeouts no Servidor HTTP (ADR-019):** Configuração de `ReadHeaderTimeout: 3s`, `ReadTimeout: 5s`, `WriteTimeout: 10s` e `IdleTimeout: 60s` no `http.Server`, mitigando ataques de exaustão de conexões (*Slowloris*).
+- **Timeouts no Servidor HTTP (ADR-019):** Configuração de `ReadHeaderTimeout: 5s`, `ReadTimeout: 10s`, `WriteTimeout: 15s` e `IdleTimeout: 60s` no `http.Server`, mitigando ataques de exaustão de conexões (*Slowloris*).
 - **Validação Estrita de Identificadores e Entradas:** Rejeição de identificadores menores ou iguais a zero com HTTP 422 `id_invalido`; rejeição no domínio de clientes com nomes ou e-mails vazios ou puramente em branco.
 - **Cabeçalhos de Segurança HTTP no Nginx:** Inclusão de `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin` e supressão da versão do servidor com `server_tokens off`.
 - **Execução Não-Root:** Ambos os containers Docker (`backend` em Alpine 3.22 e `frontend` em Nginx 1.29-alpine) executam como usuário de sistema restrito `app` (`uid=100`).
