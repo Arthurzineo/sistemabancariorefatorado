@@ -14,9 +14,11 @@ import CadastroConta from "./CadastroConta.jsx";
 import ConsultaConta from "./ConsultaConta.jsx";
 import ListaContas from "./ListaContas.jsx";
 import Transferencia from "./Transferencia.jsx";
+import { ConfirmDialog } from "../../components/ConfirmDialog.jsx";
 
-export default function Contas() {
+export default function Contas({ moderno = false }) {
   const [contas, setContas] = useState([]);
+  const [removerId, setRemoverId] = useState(null);
   const { mensagem, erro, avisar } = useMensagem();
   async function carregar() {
     try {
@@ -47,7 +49,7 @@ export default function Contas() {
   }
   async function executar(id, acao) {
     try {
-      if (acao === "remover") await removerConta(id);
+      if (acao === "remover") { setRemoverId(id); return; }
       else if (acao === "situacao") {
         const resultado = await situacaoConta(id);
         avisar(`Situação: ${resultado.situacao}`);
@@ -61,11 +63,13 @@ export default function Contas() {
   }
   async function mover(dados) {
     try {
-      await transferir(dados);
+      const resultado = await transferir(dados);
       avisar("Transferência realizada.");
       carregar();
+      return resultado;
     } catch (e) {
       avisar(e.message, true);
+      throw e;
     }
   }
   return (
@@ -75,7 +79,8 @@ export default function Contas() {
       <ConsultaConta onConsultar={consultar} />
       <CadastroConta onCadastrar={cadastrar} />
       <ListaContas contas={contas} onAcao={executar} />
-      <Transferencia onTransferir={mover} />
+      <Transferencia onTransferir={mover} contas={contas} moderno={moderno} />
+      <ConfirmDialog open={removerId !== null} onClose={() => setRemoverId(null)} onConfirm={async () => { await removerConta(removerId); setRemoverId(null); avisar("Conta removida."); carregar(); }}>Remover esta conta?</ConfirmDialog>
     </section>
   );
 }

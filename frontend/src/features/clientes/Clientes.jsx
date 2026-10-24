@@ -15,9 +15,11 @@ import CadastroCliente from "./CadastroCliente.jsx";
 import ConsultaCliente from "./ConsultaCliente.jsx";
 import ListaClientes from "./ListaClientes.jsx";
 import ValidacaoIdade from "./ValidacaoIdade.jsx";
+import { ConfirmDialog } from "../../components/ConfirmDialog.jsx";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
+  const [removerId, setRemoverId] = useState(null);
   const { mensagem, erro, avisar } = useMensagem();
 
   async function carregar() {
@@ -57,7 +59,7 @@ export default function Clientes() {
   }
   async function executar(id, acao) {
     try {
-      if (acao === "remover") await removerCliente(id);
+      if (acao === "remover") { setRemoverId(id); return; }
       else if (acao === "situacao") {
         const resultado = await situacaoCliente(id);
         avisar(`Situação: ${resultado.situacao}`);
@@ -83,6 +85,7 @@ export default function Clientes() {
           <AcoesCliente onAcao={(acao) => executar(cliente.id, acao)} />
         )}
       />
+      <ConfirmDialog open={removerId !== null} onClose={() => setRemoverId(null)} onConfirm={async () => { await removerCliente(removerId); setRemoverId(null); avisar("Cliente removido."); carregar(); }}>Remover este cliente?</ConfirmDialog>
     </section>
   );
 }
