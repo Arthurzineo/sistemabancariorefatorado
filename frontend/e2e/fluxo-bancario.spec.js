@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('cadastra conta, cliente e transfere valores pela interface', async ({ page }) => {
-  const id = String(Date.now()).slice(-7)
+  const id = String(Date.now())
   const nome = `Cliente E2E ${id}`
   await page.goto('/')
   await page.getByRole('button', { name: 'Contas' }).click()
@@ -23,7 +23,7 @@ test('cadastra conta, cliente e transfere valores pela interface', async ({ page
 
   await page.getByRole('button', { name: 'Contas' }).click()
   const transferencia = page.locator('form').filter({ has: page.getByRole('heading', { name: 'Transferir valores' }) })
-  await transferencia.getByLabel('Conta de origem').fill('1')
+  await transferencia.getByLabel('Conta de origem').fill('2')
   await transferencia.getByLabel('Conta de destino').fill(id)
   await transferencia.getByLabel('Valor').fill('10')
   await transferencia.getByRole('button', { name: 'Transferir' }).click()
@@ -43,5 +43,12 @@ test('captura as telas principais nos temas claro e escuro', async ({ page }) =>
     await page.screenshot({ path: `e2e/screenshots/contas-escuro-${sufixo}.png`, fullPage: true })
     await page.getByRole('button', { name: 'Clientes' }).click()
     await page.screenshot({ path: `e2e/screenshots/clientes-escuro-${sufixo}.png`, fullPage: true })
+    await page.getByRole('link', { name: 'Transferir' }).click()
+    await page.screenshot({ path: `e2e/screenshots/transferir-formulario-escuro-${sufixo}.png`, fullPage: true })
+    await page.getByRole('combobox', { name: 'Conta de origem' }).selectOption('1')
+    await page.getByRole('combobox', { name: 'Conta de destino' }).selectOption('2')
+    await page.locator('input[name="valor"]').fill('1')
+    await page.getByRole('button', { name: 'Revisar antes de transferir' }).click()
+    await page.screenshot({ path: `e2e/screenshots/transferir-revisao-escuro-${sufixo}.png`, fullPage: true })
   }
 })
