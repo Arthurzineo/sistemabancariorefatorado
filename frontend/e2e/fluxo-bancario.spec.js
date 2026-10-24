@@ -13,7 +13,7 @@ test("cadastra conta, cliente e transfere valores pela interface", async ({
   await conta.getByLabel("ID da conta").fill(id);
   await conta.getByLabel("Saldo").fill("0");
   await conta.getByRole("button", { name: "Cadastrar conta" }).click();
-  await expect(page.getByRole("status")).toContainText("Conta cadastrada");
+  await expect(page.getByText("Conta cadastrada.")).toBeVisible();
   await page.getByRole("button", { name: "Clientes" }).click();
   await page.getByRole("button", { name: "Novo cliente" }).click();
   const cliente = page
@@ -25,7 +25,7 @@ test("cadastra conta, cliente e transfere valores pela interface", async ({
   await cliente.getByLabel("E-mail").fill("e2e@example.com");
   await cliente.getByLabel("ID da conta corrente").fill(id);
   await cliente.getByRole("button", { name: "Cadastrar cliente" }).click();
-  await expect(page.getByRole("status")).toContainText("Cliente cadastrado");
+  await expect(page.getByText("Cliente cadastrado.")).toBeVisible();
   await page.getByRole("button", { name: "Transferir" }).click();
   const transferencia = page.locator("form.transfer-step");
   await transferencia.getByLabel("Conta de origem").selectOption("1");

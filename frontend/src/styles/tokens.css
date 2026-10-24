@@ -8,7 +8,7 @@
   --text-muted: light-dark(#607089, #a9b8cc);
   --accent: light-dark(#315bd6, #82a4ff);
   --accent-hover: light-dark(#2448b7, #a4bcff);
-  --text-on-accent: #fff;
+  --text-on-accent: light-dark(#ffffff, #0b1220);
   --focus-ring: light-dark(#315bd6, #9db7ff);
   --success: light-dark(#18794e, #6ed49d);
   --success-bg: light-dark(#e2f6eb, #153a2b);

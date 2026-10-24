@@ -1,6 +1,10 @@
 button.button {
   appearance: none;
   border: 1px solid transparent;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  font-weight: 700;
 }
 button:not(.icon-button):not(.button) {
   appearance: none;
@@ -13,7 +17,7 @@ button:not(.icon-button):not(.button) {
 }
 .button.button--primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
 }
 .button.button--primary:hover {
   background: var(--accent-hover);

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { StatusChip } from "./StatusChip.jsx";
 import { ThemeToggle } from "./ThemeToggle.jsx";
+import { Button } from "./Button.jsx";
 
 describe("componentes base", () => {
   it("expõe situação com ícone e texto", () => {
@@ -17,5 +18,12 @@ describe("componentes base", () => {
     const botao = screen.getByRole("button", { name: /tema/i });
     await user.click(botao);
     expect(document.documentElement.dataset.theme).toBe("dark");
+  });
+
+  it("expõe a variante primária com token de contraste", () => {
+    render(<Button>Primário</Button>);
+    const botao = screen.getByRole("button", { name: "Primário" });
+    expect(botao).toHaveClass("button--primary");
+    expect(botao.className).toContain("button");
   });
 });
