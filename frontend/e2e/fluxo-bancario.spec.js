@@ -30,3 +30,18 @@ test('cadastra conta, cliente e transfere valores pela interface', async ({ page
   await expect(page.getByRole('status')).toContainText('Transferência realizada')
   await expect(page.getByText(new RegExp(`Conta ${id}: 10`))).toBeVisible()
 })
+
+test('captura as telas principais nos temas claro e escuro', async ({ page }) => {
+  for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    const sufixo = `${viewport.width}x${viewport.height}`
+    await page.screenshot({ path: `e2e/screenshots/visao-geral-claro-${sufixo}.png`, fullPage: true })
+    await page.getByRole('button', { name: 'Alternar tema' }).click()
+    await page.screenshot({ path: `e2e/screenshots/visao-geral-escuro-${sufixo}.png`, fullPage: true })
+    await page.getByRole('button', { name: 'Contas' }).click()
+    await page.screenshot({ path: `e2e/screenshots/contas-escuro-${sufixo}.png`, fullPage: true })
+    await page.getByRole('button', { name: 'Clientes' }).click()
+    await page.screenshot({ path: `e2e/screenshots/clientes-escuro-${sufixo}.png`, fullPage: true })
+  }
+})
