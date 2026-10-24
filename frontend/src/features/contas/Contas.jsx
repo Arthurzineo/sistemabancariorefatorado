@@ -2,85 +2,114 @@ import { useEffect, useState } from "react";
 import {
   acaoConta,
   cadastrarConta,
-  consultarConta,
   listarContas,
   removerConta,
   situacaoConta,
-  transferir,
 } from "../../api/contas.js";
+import { Button } from "../../components/Button.jsx";
+import { ConfirmDialog } from "../../components/ConfirmDialog.jsx";
+import { Dialog } from "../../components/Dialog.jsx";
+import { EmptyState } from "../../components/EmptyState.jsx";
 import Mensagem from "../../components/Mensagem.jsx";
+import { Skeleton } from "../../components/Skeleton.jsx";
 import { useMensagem } from "../../hooks/useMensagem.js";
 import CadastroConta from "./CadastroConta.jsx";
-import ConsultaConta from "./ConsultaConta.jsx";
 import ListaContas from "./ListaContas.jsx";
-import Transferencia from "./Transferencia.jsx";
-import { ConfirmDialog } from "../../components/ConfirmDialog.jsx";
 
-export default function Contas({ moderno = false }) {
+export default function Contas() {
   const [contas, setContas] = useState([]);
+  const [busca, setBusca] = useState("");
+  const [novoAberto, setNovoAberto] = useState(false);
   const [removerId, setRemoverId] = useState(null);
   const { mensagem, erro, avisar } = useMensagem();
+
   async function carregar() {
     try {
       setContas(await listarContas());
-    } catch (e) {
-      avisar(e.message, true);
+    } catch (error) {
+      avisar(error.message, true);
     }
   }
   useEffect(() => {
     carregar();
   }, []);
+
   async function cadastrar(dados) {
     try {
       await cadastrarConta(dados);
+      setNovoAberto(false);
       avisar("Conta cadastrada.");
-      carregar();
-    } catch (e) {
-      avisar(e.message, true);
-    }
-  }
-  async function consultar(id) {
-    try {
-      const conta = await consultarConta(id);
-      avisar(`Conta ${conta.id}: ${conta.saldo} — ${conta.situacao}`);
-    } catch (e) {
-      avisar(e.message, true);
+      await carregar();
+    } catch (error) {
+      avisar(error.message, true);
     }
   }
   async function executar(id, acao) {
+    if (acao === "remover") {
+      setRemoverId(id);
+      return;
+    }
     try {
-      if (acao === "remover") { setRemoverId(id); return; }
-      else if (acao === "situacao") {
+      if (acao === "situacao") {
         const resultado = await situacaoConta(id);
         avisar(`Situação: ${resultado.situacao}`);
-        return;
-      } else await acaoConta(id, acao);
-      avisar("Operação concluída.");
-      carregar();
-    } catch (e) {
-      avisar(e.message, true);
+      } else {
+        await acaoConta(id, acao);
+        avisar("Operação concluída.");
+        await carregar();
+      }
+    } catch (error) {
+      avisar(error.message, true);
     }
   }
-  async function mover(dados) {
-    try {
-      const resultado = await transferir(dados);
-      avisar("Transferência realizada.");
-      carregar();
-      return resultado;
-    } catch (e) {
-      avisar(e.message, true);
-      throw e;
-    }
-  }
+  const filtradas = contas.filter((conta) => String(conta.id).includes(busca));
+
   return (
     <section>
-      <h2>Contas correntes</h2>
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Carteira</p>
+          <h2>Contas</h2>
+        </div>
+        <Button onClick={() => setNovoAberto(true)}>Nova conta</Button>
+      </div>
       <Mensagem texto={mensagem} erro={erro} />
-      <ConsultaConta onConsultar={consultar} />
-      <CadastroConta onCadastrar={cadastrar} />
-      <ListaContas contas={contas} onAcao={executar} />
-      <Transferencia onTransferir={mover} contas={contas} moderno={moderno} />
-      <ConfirmDialog open={removerId !== null} onClose={() => setRemoverId(null)} onConfirm={async () => { await removerConta(removerId); setRemoverId(null); avisar("Conta removida."); carregar(); }}>Remover esta conta?</ConfirmDialog>
+      <form className="toolbar" onSubmit={(event) => event.preventDefault()}>
+        <label className="field">
+          <span>Buscar conta por ID</span>
+          <input
+            value={busca}
+            onChange={(event) => setBusca(event.target.value)}
+            inputMode="numeric"
+          />
+        </label>
+      </form>
+      <Dialog
+        open={novoAberto}
+        onClose={() => setNovoAberto(false)}
+        title="Nova conta"
+      >
+        <CadastroConta onCadastrar={cadastrar} />
+      </Dialog>
+      {contas.length === 0 ? (
+        <Skeleton />
+      ) : filtradas.length === 0 ? (
+        <EmptyState>Nenhuma conta encontrada.</EmptyState>
+      ) : (
+        <ListaContas contas={filtradas} onAcao={executar} />
+      )}
+      <ConfirmDialog
+        open={removerId !== null}
+        onClose={() => setRemoverId(null)}
+        onConfirm={async () => {
+          await removerConta(removerId);
+          setRemoverId(null);
+          avisar("Conta removida.");
+          await carregar();
+        }}
+      >
+        Remover esta conta?
+      </ConfirmDialog>
     </section>
   );
 }

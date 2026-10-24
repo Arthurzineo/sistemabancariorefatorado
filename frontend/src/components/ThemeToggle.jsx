@@ -23,7 +23,12 @@ export function ThemeToggle() {
   }
 
   return (
-    <button className="icon-button" type="button" onClick={alternar} aria-label="Alternar tema">
+    <button
+      className="icon-button"
+      type="button"
+      onClick={alternar}
+      aria-label="Alternar tema"
+    >
       {tema === "dark" ? "☀" : "☾"}
     </button>
   );

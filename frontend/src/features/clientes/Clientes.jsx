@@ -16,17 +16,26 @@ import ConsultaCliente from "./ConsultaCliente.jsx";
 import ListaClientes from "./ListaClientes.jsx";
 import ValidacaoIdade from "./ValidacaoIdade.jsx";
 import { ConfirmDialog } from "../../components/ConfirmDialog.jsx";
+import { Button } from "../../components/Button.jsx";
+import { Dialog } from "../../components/Dialog.jsx";
+import { EmptyState } from "../../components/EmptyState.jsx";
+import { Skeleton } from "../../components/Skeleton.jsx";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [removerId, setRemoverId] = useState(null);
+  const [novoAberto, setNovoAberto] = useState(false);
+  const [carregando, setCarregando] = useState(true);
   const { mensagem, erro, avisar } = useMensagem();
 
   async function carregar() {
     try {
+      setCarregando(true);
       setClientes(await listarClientes());
     } catch (e) {
       avisar(e.message, true);
+    } finally {
+      setCarregando(false);
     }
   }
   useEffect(() => {
@@ -36,7 +45,8 @@ export default function Clientes() {
     try {
       await cadastrarCliente(dados);
       avisar("Cliente cadastrado.");
-      carregar();
+      setNovoAberto(false);
+      await carregar();
     } catch (e) {
       avisar(e.message, true);
     }
@@ -59,8 +69,10 @@ export default function Clientes() {
   }
   async function executar(id, acao) {
     try {
-      if (acao === "remover") { setRemoverId(id); return; }
-      else if (acao === "situacao") {
+      if (acao === "remover") {
+        setRemoverId(id);
+        return;
+      } else if (acao === "situacao") {
         const resultado = await situacaoCliente(id);
         avisar(`Situação: ${resultado.situacao}`);
         return;
@@ -74,18 +86,47 @@ export default function Clientes() {
 
   return (
     <section>
-      <h2>Clientes</h2>
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Relacionamento</p>
+          <h2>Clientes</h2>
+        </div>
+        <Button onClick={() => setNovoAberto(true)}>Novo cliente</Button>
+      </div>
       <Mensagem texto={mensagem} erro={erro} />
       <ConsultaCliente onConsultar={consultar} />
       <ValidacaoIdade onValidar={validar} />
-      <CadastroCliente onCadastrar={cadastrar} />
-      <ListaClientes
-        clientes={clientes}
-        renderAcoes={(cliente) => (
-          <AcoesCliente onAcao={(acao) => executar(cliente.id, acao)} />
-        )}
-      />
-      <ConfirmDialog open={removerId !== null} onClose={() => setRemoverId(null)} onConfirm={async () => { await removerCliente(removerId); setRemoverId(null); avisar("Cliente removido."); carregar(); }}>Remover este cliente?</ConfirmDialog>
+      <Dialog
+        open={novoAberto}
+        onClose={() => setNovoAberto(false)}
+        title="Novo cliente"
+      >
+        <CadastroCliente onCadastrar={cadastrar} />
+      </Dialog>
+      {carregando ? (
+        <Skeleton />
+      ) : clientes.length === 0 ? (
+        <EmptyState>Nenhum cliente cadastrado.</EmptyState>
+      ) : (
+        <ListaClientes
+          clientes={clientes}
+          renderAcoes={(cliente) => (
+            <AcoesCliente onAcao={(acao) => executar(cliente.id, acao)} />
+          )}
+        />
+      )}
+      <ConfirmDialog
+        open={removerId !== null}
+        onClose={() => setRemoverId(null)}
+        onConfirm={async () => {
+          await removerCliente(removerId);
+          setRemoverId(null);
+          avisar("Cliente removido.");
+          carregar();
+        }}
+      >
+        Remover este cliente?
+      </ConfirmDialog>
     </section>
   );
 }

@@ -1,10 +1,20 @@
+import { Button } from "../../components/Button.jsx";
+
 export default function AcoesCliente({ onAcao }) {
   return (
     <>
-      <button onClick={() => onAcao("ativar")}>Ativar</button>
-      <button onClick={() => onAcao("desativar")}>Desativar</button>
-      <button onClick={() => onAcao("situacao")}>Ver situação</button>
-      <button onClick={() => onAcao("remover")}>Remover</button>
+      <Button variant="ghost" onClick={() => onAcao("ativar")}>
+        Ativar
+      </Button>
+      <Button variant="ghost" onClick={() => onAcao("desativar")}>
+        Desativar
+      </Button>
+      <Button variant="ghost" onClick={() => onAcao("situacao")}>
+        Ver situação
+      </Button>
+      <Button variant="danger" onClick={() => onAcao("remover")}>
+        Remover
+      </Button>
     </>
   );
 }
