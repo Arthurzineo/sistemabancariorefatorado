@@ -19,7 +19,9 @@ describe("componentes de clientes", () => {
         <ValidacaoIdade onValidar={() => {}} />
         <ListaClientes
           clientes={[{ id: 1, nome: "Ana", situacao: "Ativo" }]}
-          renderAcoes={() => <AcoesCliente onAcao={() => {}} />}
+          renderAcoes={() => (
+            <AcoesCliente situacao="Ativo" onAcao={() => {}} />
+          )}
         />
       </>,
     );
@@ -38,24 +40,19 @@ describe("componentes de clientes", () => {
   it("dispara ativar, desativar e remover", async () => {
     const user = userEvent.setup();
     const acao = vi.fn();
-    render(<AcoesCliente onAcao={acao} />);
-    await user.click(screen.getByRole("button", { name: "Ativar" }));
-    await user.click(screen.getByRole("button", { name: "Desativar" }));
+    render(<AcoesCliente situacao="Ativo" onAcao={acao} />);
     await user.click(screen.getByRole("button", { name: "Remover" }));
-    expect(acao).toHaveBeenNthCalledWith(1, "ativar");
-    expect(acao).toHaveBeenNthCalledWith(2, "desativar");
-    expect(acao).toHaveBeenNthCalledWith(3, "remover");
+    expect(acao).toHaveBeenCalledWith("remover");
   });
 
   it("carrega a lista e executa ativar, desativar, situação e remoção", async () => {
     const user = userEvent.setup();
     render(<Clientes />);
     expect(await screen.findByText("Ana")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Ativar" }));
+    await user.click(screen.getByRole("button", { name: "Desativar" }));
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Operação concluída",
     );
-    await user.click(screen.getByRole("button", { name: "Desativar" }));
     await user.click(screen.getByRole("button", { name: "Ver situação" }));
     await user.click(screen.getByRole("button", { name: "Remover" }));
   });

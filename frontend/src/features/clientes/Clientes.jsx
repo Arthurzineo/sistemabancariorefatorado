@@ -111,7 +111,10 @@ export default function Clientes() {
         <ListaClientes
           clientes={clientes}
           renderAcoes={(cliente) => (
-            <AcoesCliente onAcao={(acao) => executar(cliente.id, acao)} />
+            <AcoesCliente
+              situacao={cliente.situacao}
+              onAcao={(acao) => executar(cliente.id, acao)}
+            />
           )}
         />
       )}

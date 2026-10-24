@@ -18,9 +18,11 @@ export default function VisaoGeral({ onNavigate }) {
   }, []);
   if (erro) return <p role="alert">{erro}</p>;
   if (!dados) return <Skeleton label="Carregando visão geral" />;
-  const ativas = dados.contas.filter((conta) => /ativa/i.test(conta.situacao));
+  const ativas = dados.contas.filter((conta) =>
+    /^(ativa|ativo)$/i.test(conta.situacao),
+  );
   const clientesAtivos = dados.clientes.filter((cliente) =>
-    /ativo/i.test(cliente.situacao),
+    /^(ativa|ativo)$/i.test(cliente.situacao),
   );
   const total = ativas.reduce((soma, conta) => soma + Number(conta.saldo), 0);
   return (
@@ -43,8 +45,6 @@ export default function VisaoGeral({ onNavigate }) {
           value={ativas.length}
           detail={`${dados.contas.length - ativas.length} inativas`}
         />
-        <StatCard label="Clientes" value={dados.clientes.length} />
-        <StatCard label="Contas" value={dados.contas.length} />
       </div>
       <div className="quick-actions">
         <button
@@ -54,13 +54,13 @@ export default function VisaoGeral({ onNavigate }) {
           ＋ Nova transferência
         </button>
         <button
-          className="button button--ghost"
+          className="button button--primary"
           onClick={() => onNavigate("contas")}
         >
           ＋ Nova conta
         </button>
         <button
-          className="button button--ghost"
+          className="button button--primary"
           onClick={() => onNavigate("clientes")}
         >
           ＋ Novo cliente

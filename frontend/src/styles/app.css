@@ -101,6 +101,7 @@ select:focus-visible {
   min-width: 0;
   padding: var(--space-6) clamp(var(--space-4), 5vw, var(--space-8));
 }
+main { padding-bottom: 0; }
 .topbar {
   display: flex;
   align-items: center;
@@ -384,6 +385,7 @@ th:nth-child(3) {
   .content {
     padding: var(--space-4);
   }
+  main { padding-bottom: 5rem; }
   .stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

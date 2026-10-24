@@ -1,13 +1,14 @@
 import { Button } from "../../components/Button.jsx";
 
-export default function AcoesCliente({ onAcao }) {
+export default function AcoesCliente({ onAcao, situacao }) {
+  const ativa = /^(ativa|ativo)$/i.test(situacao);
   return (
     <>
-      <Button variant="ghost" onClick={() => onAcao("ativar")}>
-        Ativar
-      </Button>
-      <Button variant="ghost" onClick={() => onAcao("desativar")}>
-        Desativar
+      <Button
+        variant="ghost"
+        onClick={() => onAcao(ativa ? "desativar" : "ativar")}
+      >
+        {ativa ? "Desativar" : "Ativar"}
       </Button>
       <Button variant="ghost" onClick={() => onAcao("situacao")}>
         Ver situação
