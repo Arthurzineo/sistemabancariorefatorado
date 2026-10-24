@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "../../components/Button.jsx";
 const inicial = { id: "", saldo: "", ativo: true };
 export default function CadastroConta({ onCadastrar }) {
   const [formulario, setFormulario] = useState(inicial);
@@ -52,7 +53,7 @@ export default function CadastroConta({ onCadastrar }) {
           onChange={alterar}
         />
       </label>
-      <button>Cadastrar conta</button>
+      <Button type="submit">Cadastrar conta</Button>
     </form>
   );
 }

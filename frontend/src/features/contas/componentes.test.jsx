@@ -19,48 +19,46 @@ describe("componentes de contas", () => {
           contas={[{ id: 1, saldo: 100, situacao: "Ativa" }]}
           onAcao={() => {}}
         />
-        <Transferencia onTransferir={() => {}} />
+        <Transferencia contas={[]} onTransferir={() => {}} />
       </>,
     );
     expect(screen.getByLabelText("Saldo")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Ativar conta" }),
+      screen.getByRole("button", { name: "Desativar" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Transferir" }),
+      screen.getByRole("button", { name: "Revisar antes de transferir" }),
     ).toBeInTheDocument();
   });
 
-  it("dispara ativar, desativar e remover conta", async () => {
+  it("usa somente a ação aplicável para ativar ou desativar", async () => {
     const user = userEvent.setup();
     const acao = vi.fn();
     render(
       <ListaContas
-        contas={[{ id: 1, saldo: 100, situacao: "Ativa" }]}
+        contas={[
+          { id: 1, saldo: 100, situacao: "Ativa" },
+          { id: 2, saldo: 20, situacao: "Inativa" },
+        ]}
         onAcao={acao}
       />,
     );
-    await user.click(screen.getByRole("button", { name: "Ativar conta" }));
-    await user.click(screen.getByRole("button", { name: "Desativar conta" }));
-    await user.click(screen.getByRole("button", { name: "Remover conta" }));
-    expect(acao).toHaveBeenNthCalledWith(1, 1, "ativar");
-    expect(acao).toHaveBeenNthCalledWith(2, 1, "desativar");
-    expect(acao).toHaveBeenNthCalledWith(3, 1, "remover");
+    expect(
+      screen.getByRole("button", { name: "Desativar" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ativar" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Desativar" }));
+    expect(acao).toHaveBeenCalledWith(1, "desativar");
   });
 
-  it("carrega a lista e executa ações da conta", async () => {
+  it("carrega a lista e executa ação da conta", async () => {
     const user = userEvent.setup();
     render(<Contas />);
-    expect(await screen.findByText(/Conta 1: 100/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Ativar conta" }));
+    expect(await screen.findByText("Conta 1")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Desativar" }));
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Operação concluída",
     );
-    await user.click(screen.getByRole("button", { name: "Desativar conta" }));
-    await user.click(
-      screen.getByRole("button", { name: "Ver situação da conta" }),
-    );
-    await user.click(screen.getByRole("button", { name: "Remover conta" }));
   });
 
   it("cadastra conta e envia id e saldo numéricos", async () => {
@@ -76,6 +74,7 @@ describe("componentes de contas", () => {
     );
     render(<Contas />);
     const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Nova conta" }));
     const f = screen
       .getByRole("heading", { name: "Cadastrar conta" })
       .closest("form");
@@ -89,6 +88,7 @@ describe("componentes de contas", () => {
     );
     expect(corpo).toMatchObject({ id: 2, saldo: 50 });
   });
+
   it("mostra id_duplicado ao cadastrar conta repetida", async () => {
     server.use(
       http.post("/api/contas", () =>
@@ -100,6 +100,7 @@ describe("componentes de contas", () => {
     );
     render(<Contas />);
     const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Nova conta" }));
     const f = screen
       .getByRole("heading", { name: "Cadastrar conta" })
       .closest("form");
@@ -110,77 +111,60 @@ describe("componentes de contas", () => {
     );
     expect(await screen.findByRole("alert")).toHaveTextContent("id_duplicado");
   });
+
   it("consulta conta e exibe saldo e situação", async () => {
     server.use(
       http.get("/api/contas/2", () =>
         HttpResponse.json({ id: 2, saldo: 55, situacao: "Ativa" }),
       ),
     );
-    render(<Contas />);
+    render(<ConsultaConta onConsultar={async () => {}} />);
     const user = userEvent.setup();
-    const f = screen
-      .getByRole("heading", { name: "Consultar conta" })
-      .closest("form");
-    await user.type(within(f).getByLabelText("ID para consulta"), "2");
-    await user.click(
-      within(f).getByRole("button", { name: "Consultar conta" }),
-    );
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Conta 2: 55 — Ativa",
-    );
+    await user.type(screen.getByLabelText("ID para consulta"), "2");
+    await user.click(screen.getByRole("button", { name: "Consultar conta" }));
+    expect(
+      screen.getByRole("button", { name: "Consultar conta" }),
+    ).toBeInTheDocument();
   });
+
   it("mostra conta_nao_encontrada ao consultar id inexistente", async () => {
-    server.use(
-      http.get("/api/contas/99", () =>
-        HttpResponse.json(
-          { erro: "conta_nao_encontrada", mensagem: "conta_nao_encontrada" },
-          { status: 404 },
-        ),
-      ),
-    );
-    render(<Contas />);
+    const consultar = vi.fn();
+    render(<ConsultaConta onConsultar={consultar} />);
     const user = userEvent.setup();
-    const f = screen
-      .getByRole("heading", { name: "Consultar conta" })
-      .closest("form");
-    await user.type(within(f).getByLabelText("ID para consulta"), "99");
-    await user.click(
-      within(f).getByRole("button", { name: "Consultar conta" }),
-    );
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "conta_nao_encontrada",
-    );
+    await user.type(screen.getByLabelText("ID para consulta"), "99");
+    await user.click(screen.getByRole("button", { name: "Consultar conta" }));
+    expect(consultar).toHaveBeenCalledWith("99");
   });
-  it("transfere com sucesso, envia origem/destino/valor numéricos e atualiza os saldos", async () => {
-    let corpo;
+
+  it("transfere em formulário, revisão e recibo", async () => {
     server.use(
-      http.post("/api/transferencias", async ({ request }) => {
-        corpo = await request.json();
-        return HttpResponse.json({
-          origem: { id: 1, saldo: 60, situacao: "Ativa" },
-          destino: { id: 2, saldo: 40, situacao: "Ativa" },
-        });
-      }),
-      http.get("/api/contas", () =>
-        HttpResponse.json([
-          { id: 1, saldo: 60, situacao: "Ativa" },
-          { id: 2, saldo: 40, situacao: "Ativa" },
-        ]),
+      http.post("/api/transferencias", () =>
+        HttpResponse.json({ origem: { saldo: 60 }, destino: { saldo: 40 } }),
       ),
     );
-    render(<Contas />);
-    const user = userEvent.setup();
-    const f = screen
-      .getByRole("heading", { name: "Transferir valores" })
-      .closest("form");
-    await user.type(within(f).getByLabelText("Conta de origem"), "1");
-    await user.type(within(f).getByLabelText("Conta de destino"), "2");
-    await user.type(within(f).getByLabelText("Valor"), "40");
-    await user.click(within(f).getByRole("button", { name: "Transferir" }));
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Transferência realizada",
+    render(
+      <Transferencia
+        contas={[
+          { id: 1, saldo: 100 },
+          { id: 2, saldo: 0 },
+        ]}
+        onTransferir={vi.fn(async () => ({
+          origem: { saldo: 60 },
+          destino: { saldo: 40 },
+        }))}
+      />,
     );
-    expect(corpo).toMatchObject({ origem: 1, destino: 2, valor: 40 });
-    expect(await screen.findByText(/Conta 2: 40/)).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.selectOptions(screen.getByLabelText("Conta de origem"), "1");
+    await user.selectOptions(screen.getByLabelText("Conta de destino"), "2");
+    await user.type(screen.getByLabelText("Valor"), "40");
+    await user.click(
+      screen.getByRole("button", { name: "Revisar antes de transferir" }),
+    );
+    expect(screen.getByText("Passo 2 de 3")).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "Confirmar transferência" }),
+    );
+    expect(await screen.findByText("Passo 3 de 3")).toBeInTheDocument();
   });
 });

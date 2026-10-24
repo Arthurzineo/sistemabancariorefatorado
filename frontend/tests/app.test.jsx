@@ -1,34 +1,62 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { http, HttpResponse } from "msw";
 import App from "../src/App.jsx";
 import { server } from "./server.js";
 
+async function abrirTransferencia() {
+  const user = userEvent.setup();
+  server.use(
+    http.get("/api/contas", () =>
+      HttpResponse.json([
+        { id: 1, saldo: 100, situacao: "Ativa" },
+        { id: 2, saldo: 50, situacao: "Ativa" },
+      ]),
+    ),
+  );
+  render(<App />);
+  await user.click(screen.getByRole("button", { name: "Transferir" }));
+  await user.selectOptions(screen.getByLabelText("Conta de origem"), "1");
+  await user.selectOptions(screen.getByLabelText("Conta de destino"), "2");
+  await user.type(screen.getByLabelText("Valor"), "10");
+  return { user };
+}
+
 describe("Sistema Bancário", () => {
-  it("navega entre clientes e contas com controles acessíveis", async () => {
+  it("navega entre clientes, contas e transferência", async () => {
     const user = userEvent.setup();
     render(<App />);
-    expect(
-      screen.getByRole("heading", { name: /sistema bancário/i }),
-    ).toBeInTheDocument();
     expect(await screen.findByText("Ana")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: /contas/i }));
+    await user.click(screen.getByRole("button", { name: "Contas" }));
+    expect(screen.getByRole("heading", { name: "Contas" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Clientes" }));
     expect(
-      screen.getByRole("heading", { name: /contas correntes/i }),
+      screen.getByRole("heading", { name: "Clientes" }),
     ).toBeInTheDocument();
   });
 
   it("mostra a mensagem devolvida pela API ao falhar transferência", async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole("button", { name: /^contas$/i }));
-    await user.type(screen.getByLabelText("Conta de origem"), "1");
-    await user.type(screen.getByLabelText("Conta de destino"), "2");
-    await user.type(screen.getByLabelText("Valor"), "500");
-    await user.click(screen.getByRole("button", { name: /^transferir$/i }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Saldo insuficiente na conta de origem.",
+    server.use(
+      http.post("/api/transferencias", () =>
+        HttpResponse.json(
+          {
+            erro: "saldo_insuficiente",
+            mensagem: "Saldo insuficiente na conta de origem.",
+          },
+          { status: 422 },
+        ),
+      ),
+    );
+    const { user } = await abrirTransferencia();
+    await user.click(
+      screen.getByRole("button", { name: "Revisar antes de transferir" }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Confirmar transferência" }),
+    );
+    expect((await screen.findAllByRole("alert"))[0]).toHaveTextContent(
+      "Saldo insuficiente",
     );
   });
 
@@ -45,14 +73,15 @@ describe("Sistema Bancário", () => {
         HttpResponse.json({ erro: _codigo, mensagem }, { status: 422 }),
       ),
     );
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole("button", { name: /^contas$/i }));
-    await user.type(screen.getByLabelText("Conta de origem"), "1");
-    await user.type(screen.getByLabelText("Conta de destino"), "2");
-    await user.type(screen.getByLabelText("Valor"), "10");
-    await user.click(screen.getByRole("button", { name: /^transferir$/i }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(mensagem);
-    cleanup();
+    const { user } = await abrirTransferencia();
+    await user.click(
+      screen.getByRole("button", { name: "Revisar antes de transferir" }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Confirmar transferência" }),
+    );
+    expect((await screen.findAllByRole("alert"))[0]).toHaveTextContent(
+      mensagem,
+    );
   });
 });

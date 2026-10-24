@@ -1,7 +1,7 @@
 import { Icon } from "./Icon.jsx";
 
 export function StatusChip({ situacao }) {
-  const ativa = /ativa|ativo/i.test(situacao);
+  const ativa = /^(ativa|ativo)$/i.test(situacao);
   return (
     <span
       className={`status-chip ${ativa ? "status-chip--active" : "status-chip--inactive"}`}

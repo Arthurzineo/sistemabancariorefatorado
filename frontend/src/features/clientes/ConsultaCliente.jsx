@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Button } from "../../components/Button.jsx";
+import { Field } from "../../components/Field.jsx";
 export default function ConsultaCliente({ onConsultar }) {
   const [id, setId] = useState("");
   function enviar(e) {
@@ -8,16 +10,15 @@ export default function ConsultaCliente({ onConsultar }) {
   return (
     <form onSubmit={enviar}>
       <h3>Consultar cliente</h3>
-      <label>
-        ID do cliente
-        <input
-          type="number"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          required
-        />
-      </label>
-      <button>Consultar cliente</button>
+      <Field
+        label="ID do cliente"
+        name="id-cliente"
+        type="number"
+        value={id}
+        onChange={(e) => setId(e.target.value)}
+        required
+      />
+      <Button>Consultar cliente</Button>
     </form>
   );
 }

@@ -23,11 +23,15 @@ export default function ListaContas({ contas, onAcao }) {
                 onClick={() =>
                   onAcao(
                     conta.id,
-                    conta.situacao === "ATIVA" ? "desativar" : "ativar",
+                    /^(ativa|ativo)$/i.test(conta.situacao)
+                      ? "desativar"
+                      : "ativar",
                   )
                 }
               >
-                {conta.situacao === "ATIVA" ? "Desativar" : "Ativar"}
+                {/^(ativa|ativo)$/i.test(conta.situacao)
+                  ? "Desativar"
+                  : "Ativar"}
               </Button>
               <Button
                 variant="ghost"
