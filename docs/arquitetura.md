@@ -126,46 +126,74 @@ O domínio expõe erros sentinela (`errors.Is`). O adapter HTTP mapeia esses err
 frontend/
 ├── index.html
 ├── vite.config.js                 # proxy /api → backend em dev
-├── nginx.conf                     # proxy /api → backend em produção
-├── package.json                   # versões exatas fixadas (ADR-017)
+├── nginx.conf                     # proxy /api → backend em produção com headers de segurança
+├── package.json                   # versões exatas fixadas (ADR-017, ADR-020)
 ├── package-lock.json
 ├── src/
 │   ├── main.jsx
-│   ├── App.jsx                    # navegação simples em abas (Clientes, Contas)
-│   ├── api/                       # cliente HTTP (fetch), um arquivo por recurso
+│   ├── App.jsx                    # app shell responsivo (sidebar desktop ≥ 960px, bottom nav mobile < 960px)
+│   ├── api/                       # cliente HTTP (fetch) desacoplado por recurso
 │   │   ├── http.js
 │   │   ├── clientes.js
 │   │   └── contas.js
-│   ├── components/                # UI genérica
-│   │   └── Mensagem.jsx           # feedback de alertas e erros (role="alert")
+│   ├── components/                # biblioteca de componentes base acessíveis (WCAG 2.2 AA)
+│   │   ├── Button.jsx             # variantes: primary (accent), secondary, danger, ghost
+│   │   ├── Card.jsx
+│   │   ├── StatCard.jsx           # cartões estatísticos de resumo com ícone
+│   │   ├── StatusChip.jsx         # chip com ícone + texto (nunca só cor)
+│   │   ├── Field.jsx              # label, dica e erro associados via aria-describedby
+│   │   ├── Select.jsx             # select customizado e acessível com exibição de saldos
+│   │   ├── Dialog.jsx             # modal nativo (<dialog>) com captura e devolução de foco
+│   │   ├── ConfirmDialog.jsx      # diálogo de confirmação para remoção
+│   │   ├── Toast.jsx              # feedback de sucesso (role="status") e erro (role="alert")
+│   │   ├── Mensagem.jsx           # compatibilidade com mensagens inline
+│   │   ├── EmptyState.jsx         # visual para listas e estados vazios
+│   │   ├── Skeleton.jsx           # placeholders de carregamento
+│   │   ├── Icon.jsx               # ícones SVG inline próprios (sem bibliotecas externas)
+│   │   ├── ThemeToggle.jsx        # alternador de tema claro/escuro com persistência
+│   │   ├── base.test.jsx          # testes de renderização e variantes dos componentes
+│   │   └── a11y.test.jsx          # validação de acessibilidade e atributos ARIA
 │   ├── hooks/
-│   │   └── useMensagem.js         # hook isolado para gestão de mensagens (ADR-017)
+│   │   └── useMensagem.js         # hook isolado para gestão de mensagens e feedback
+│   ├── lib/
+│   │   ├── formato.js             # formatação BRL com Intl.NumberFormat e algarismos tabulares
+│   │   ├── formato.test.js
+│   │   └── erros.js               # mapeamento de códigos de erro da API para português com acentuação
 │   ├── features/
+│   │   ├── visao/                 # seção Visão Geral (P008)
+│   │   │   └── VisaoGeral.jsx     # saldo total, cartões estatísticos e atalhos rápidos
 │   │   ├── clientes/              # componentes por responsabilidade (ADR-017)
-│   │   │   ├── Clientes.jsx       # container da aba de clientes
-│   │   │   ├── CadastroCliente.jsx
+│   │   │   ├── Clientes.jsx       # container da aba de clientes (tabela desktop / cartões mobile)
+│   │   │   ├── CadastroCliente.jsx # dialog com validação imediata de idade (18 a 65 anos)
 │   │   │   ├── ConsultaCliente.jsx
 │   │   │   ├── ValidacaoIdade.jsx
 │   │   │   ├── ListaClientes.jsx
-│   │   │   ├── AcoesCliente.jsx   # ativar, desativar, situação e remover
-│   │   │   └── componentes.test.jsx
+│   │   │   ├── AcoesCliente.jsx   # ações secundárias em variantes compactas/ghost
+│   │   │   └── componentes.test.jsx # 10 testes de clientes
 │   │   └── contas/                # componentes por responsabilidade (ADR-017)
-│   │       ├── Contas.jsx         # container da aba de contas
+│   │       ├── Contas.jsx         # grade de cartões de contas e busca por ID
 │   │       ├── CadastroConta.jsx
 │   │       ├── ConsultaConta.jsx
 │   │       ├── ListaContas.jsx
-│   │       ├── Transferencia.jsx  # formulário de transferência com 6 erros tipados
-│   │       └── componentes.test.jsx
+│   │       ├── Transferencia.jsx  # formulário de transferência em 3 passos (form → revisão → recibo)
+│   │       ├── TransferenciaPage.jsx # container dedicado da aba Transferir
+│   │       └── componentes.test.jsx # 8 testes de contas e transferência
 │   └── styles/
-│       └── app.css
+│       ├── tokens.css             # tokens semânticos (superfícies, texto, cores de estado, light-dark())
+│       ├── forms.css              # estilização padronizada de inputs, selects e rótulos
+│       ├── components.css         # botões, chips, diálogos e cards
+│       └── app.css                # layout responsivo, sidebar, bottom navigation e tipografia
 ├── tests/
-│   ├── app.test.jsx               # testes de integração e erros de transferência
+│   ├── app.test.jsx               # testes de integração e fluxos de navegação e erro
 │   ├── server.js                  # handlers e setup do MSW
 │   └── setup.js                   # cleanup e polyfills do Vitest
+├── e2e/
+│   ├── fluxo-bancario.spec.js     # teste ponta a ponta com Playwright e geração de screenshots
+│   └── screenshots/               # capturas em tema claro/escuro e resoluções 1280px e 390px
 └── Dockerfile
 ```
 
-React + Vite em **JavaScript** (ver [ADR-004](decisoes.md#adr-004)). Componentização por responsabilidade única com hook `useMensagem` e código legível e formatado ([ADR-017](decisoes.md#adr-017)). Sem biblioteca de estado global: `useState` e hooks locais.
+React + Vite em **JavaScript** moderno sem dependências pesadas de runtime ([ADR-004](decisoes.md#adr-004), [ADR-020](decisoes.md#adr-020)). Componentização por responsabilidade única ([ADR-017](decisoes.md#adr-017)), tokens de design semânticos com `light-dark()`, acessibilidade WCAG 2.2 AA e 33 testes automatizados cobrindo a interface.
 
 ## 4. Fluxo de uma transferência
 

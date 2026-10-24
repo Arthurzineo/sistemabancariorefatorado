@@ -12,9 +12,9 @@ mantidas, cada uma onde faz mais sentido na arquitetura nova.
 | Contrato de repositório | `go test` (mesma suíte para os 2 adapters) | Memory e SQLite se comportam igual | `tests/contract/` |
 | API HTTP | `net/http/httptest` | Rotas, JSON, mapeamento erro → status | `internal/adapters/http/*_test.go` |
 | BDD (aceitação) | **godog** (Cucumber para Go), Gherkin em português | Os 15 cenários do original + novos | `features/` + `tests/bdd/` |
-| Frontend: componentes | **Vitest** + **React Testing Library** | Formulários, mensagens, estados | `frontend/src/**/*.test.jsx` |
-| Frontend: integração | Vitest + **MSW** (mock da API) | Telas chamando a API e mostrando o resultado | `frontend/src/**/*.test.jsx` |
-| E2E (opcional) | **Playwright** contra o `docker compose` | Fluxo completo navegador → nginx → Go → SQLite | `e2e/` |
+| Frontend: componentes e design system | **Vitest** + **React Testing Library** | Componentes base, a11y, formulários, formatação e features | `frontend/src/**/*.test.{js,jsx}` |
+| Frontend: integração | Vitest + **MSW** (mock da API) | Navegação, fluxo guiado de transferência e erros | `frontend/tests/**/*.test.jsx` |
+| E2E e regressão visual | **Playwright** contra o `docker compose` | Fluxo completo ponta a ponta e capturas visuais (desktop/mobile, claro/escuro) | `frontend/e2e/` |
 
 ## 2. TDD — como registrar
 
@@ -61,10 +61,13 @@ A evidência é **só o histórico git** (decisão do usuário, 2026-10-22, ver 
 | — (novo: suíte de contrato parametrizada) | `tests/contract/*_test.go` | `tests/contract/contratos_test.go`, `memory_test.go`, `sqlite_test.go` | Concluído (P003) |
 | — (novo: rotas REST, handlers desacoplados e segurança) | `internal/adapters/http/*_test.go` | `internal/adapters/http/router_test.go` (httptest cobrindo rotas, erros, 413 corpo grande e mesma conta) | Concluído (P004/P007) |
 | — (novo: validação e segurança no domínio) | `domain/cliente/*_test.go` | `internal/domain/cliente/cliente_security_test.go`, `cliente_test.go` | Concluído (P007) |
-| — (novo: componentes frontend de clientes) | `frontend/src/features/clientes/*.test.jsx` | `src/features/clientes/componentes.test.jsx` (8 testes: cadastro, validação de idade, ações) | Concluído (P005) |
-| — (novo: componentes frontend de contas) | `frontend/src/features/contas/*.test.jsx` | `src/features/contas/componentes.test.jsx` (6 testes: cadastro, consulta, ações e fluxo feliz) | Concluído (P005) |
-| — (novo: integração frontend e erros MSW) | `frontend/tests/*.test.jsx` | `tests/app.test.jsx` (12 testes: navegação, acessibilidade e 6 motivos de recusa da transferência) | Concluído (P005) |
-| — (novo: E2E Playwright ponta a ponta) | `frontend/e2e/*.spec.js` | `e2e/fluxo-bancario.spec.js` (fluxo completo: cadastro de conta, cliente e transferência na stack Docker) | Concluído (P006) |
+| — (novo: utilitários de formatação frontend) | `frontend/src/lib/*.test.js` | `src/lib/formato.test.js` (1 teste: formatação monetária BRL determinística) | Concluído (P008) |
+| — (novo: componentes base do design system) | `frontend/src/components/*.test.jsx` | `src/components/base.test.jsx` (3 testes: renderização de Botao, Card, Campo, Badge, Toast, Modal) | Concluído (P008) |
+| — (novo: acessibilidade a11y dos componentes) | `frontend/src/components/*.test.jsx` | `src/components/a11y.test.jsx` (3 testes: roles semânticos, foco em modais, labels acessíveis) | Concluído (P008) |
+| — (novo: componentes frontend de clientes) | `frontend/src/features/clientes/*.test.jsx` | `src/features/clientes/componentes.test.jsx` (10 testes: formulário, validações, listagem, filtros e ações) | Concluído (P005/P008) |
+| — (novo: componentes frontend de contas) | `frontend/src/features/contas/*.test.jsx` | `src/features/contas/componentes.test.jsx` (8 testes: abertura, listagem, fluxo guiado de transferência em 3 passos) | Concluído (P005/P008) |
+| — (novo: integração frontend e erros MSW) | `frontend/tests/*.test.jsx` | `tests/app.test.jsx` (8 testes: navegação por abas, fluxo guiado com revisão/recibo e motivos de recusa da API) | Concluído (P005/P008) |
+| — (novo: E2E Playwright e capturas visuais) | `frontend/e2e/*.spec.js` | `e2e/fluxo-bancario.spec.js` (fluxo bancário completo na stack Docker e geração de capturas para evidência visual) | Concluído (P006/P008) |
 
 ## 6. Comandos (alvo)
 
