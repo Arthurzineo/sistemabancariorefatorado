@@ -9,7 +9,7 @@
 O objetivo principal deste projeto é modernizar a arquitetura e a experiência de uso de um sistema bancário legado, originalmente implementado em Java 8 como aplicação de console monolítica, transformando-o em uma aplicação cliente-servidor distribuída:
 
 - **Backend:** Desenvolvido em **Go 1.25** adotando arquitetura hexagonal (*ports & adapters*) e princípios de MVC, sem frameworks pesados de roteamento, priorizando concisão e compilação estática.
-- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+) sem TypeScript ([ADR-004](docs/decisoes.md#adr-004)), componentização estrita por responsabilidade ([ADR-017](docs/decisoes.md#adr-017)) e foco em acessibilidade.
+- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+) sem TypeScript ([ADR-004](docs/decisoes.md#adr-004)), componentização estrita por responsabilidade ([ADR-017](docs/decisoes.md#adr-017)), design system moderno com suporte a tema claro/escuro nativo (`light-dark()`), fluxo guiado de transferência em 3 passos e foco em acessibilidade WCAG 2.2 AA ([ADR-020](docs/decisoes.md#adr-020)).
 - **Persistência de Dados:** Base relacional **SQLite** com modo Write-Ahead Logging (WAL) acessada via DAO utilizando driver puro Go (`modernc.org/sqlite v1.58.0`, sem necessidade de CGO, [ADR-005](docs/decisoes.md#adr-005), [ADR-015](docs/decisoes.md#adr-015)), acompanhada de adaptador em memória (`memory`) com clonagem defensiva para testes rápidos.
 - **Transacionalidade e Atomicidade:** Operações de transferência atômica com reversão integral (*rollback*) em caso de falhas, coordenadas pelo padrão *Unit of Work*.
 - **Infraestrutura e Orquestração:** Empacotamento em **2 containers Docker** orquestrados por `docker compose`, executando como usuários de sistema sem privilégios de root (`app`, `uid=100`) em rede interna isolada `banco-net`.
@@ -94,21 +94,50 @@ A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a s
 - **`cmd/api/main.go`:** Ponto de entrada (*composition root*) configurando timeouts estritos no `http.Server` (ReadHeader, Read, Write, Idle) e graceful shutdown de 5 segundos via sinais `SIGINT`/`SIGTERM`.
 
 ### 2.2 Frontend em React (`frontend/`)
-- **`src/features/clientes/`:** Componentes independentes para consulta, cadastro com validação de idade (18 a 65 anos) e listagem/gerenciamento de clientes.
-- **`src/features/contas/`:** Componentes desacoplados para consulta de saldo, cadastro de conta, gerenciamento de situação (ativa/inativa) e formulário transacional de transferência.
-- **`src/hooks/useMensagem.js`:** Hook para gerenciar estado local de feedback (`mensagem`, flag booleana `erro` e função `avisar(texto, falhou)`).
-- **`src/components/Mensagem.jsx`:** Componente de alerta que renderiza `<p role={erro ? "alert" : "status"}>{texto}</p>` quando há mensagem definida.
-- **`src/features/*/componentes.test.jsx` e `tests/app.test.jsx`:** Suíte completa de testes de componentes e integração utilizando **Vitest**, **React Testing Library** e **Mock Service Worker (MSW)** cobrindo renderização, formulários, ações de tela e tratamento de erros tipados da API.
-- **`e2e/fluxo-bancario.spec.js`:** Testes ponta a ponta reais com **Playwright** executando contra o ambiente conteinerizado.
+- **`src/components/`:** Biblioteca de componentes base acessíveis (WCAG 2.2 AA) sem dependências externas: `Button` (variantes primary, secondary, danger e ghost), `Card`, `StatCard`, `StatusChip` (ícone + texto), `Field` (com rótulo e erro via `aria-describedby`), `Select`, `Dialog` (nativo `<dialog>` com captura e devolução de foco), `ConfirmDialog`, `Toast`, `EmptyState`, `Skeleton`, `Icon` (SVGs inline próprios) e `ThemeToggle`.
+- **`src/features/visao/`:** Seção de Visão Geral com saldo total consolidado das contas ativas, cartões-resumo e atalhos rápidos de navegação.
+- **`src/features/clientes/`:** Componentes desacoplados para consulta por ID, cadastro com validação de idade imediata (18 a 65 anos), listagem tabular e gerenciamento de situação (ativar, desativar e remoção confirmada).
+- **`src/features/contas/`:** Componentes modulares para abertura de contas, grade responsiva de cartões de contas, consulta e formulário guiado de transferência.
+- **`src/features/contas/Transferencia.jsx`:** Fluxo transacional seguro em 3 passos: formulário de dados com visualização de saldos → tela de revisão antes da efetivação → recibo detalhado da operação.
+- **`src/lib/`:** Utilitários de formatação de moeda BRL com algarismos tabulares (`formato.js`) e mapeamento amigável de erros da API para português com acentuação (`erros.js`).
+- **`src/styles/`:** Sistema de estilos estruturado em tokens semânticos (`tokens.css`) com suporte a temas claro/escuro via `light-dark()` e preferência do sistema, formulários (`forms.css`), componentes (`components.css`) e layout responsivo (`app.css`).
+- **`src/components/*.test.jsx`, `src/features/*/componentes.test.jsx`, `src/lib/formato.test.js` e `tests/app.test.jsx`:** Suíte completa com **33 testes automatizados** utilizando **Vitest**, **React Testing Library** e **Mock Service Worker (MSW)** cobrindo acessibilidade, validações, componentes e integração.
+- **`e2e/fluxo-bancario.spec.js`:** Testes ponta a ponta reais com **Playwright** executando contra o ambiente conteinerizado e gerando capturas visuais desktop e mobile.
 
 ---
 
-## 3. Como Executar a Aplicação
+## 3. Interface da Aplicação
 
-### 3.1 Pré-requisitos
+A interface foi reformulada na fase **P008** ([ADR-020](docs/decisoes.md#adr-020)) adotando padrões modernos de aplicações financeiras (clareza hierárquica, dados em algarismos tabulares, estados explícitos com texto + ícone e prevenção de erros transacionais), com acessibilidade em nível **WCAG 2.2 AA**, suporte completo a tema claro e escuro e layout adaptativo para dispositivos móveis e desktops.
+
+### 3.1 Visão Geral e Saldos Consolidados (Tema Claro — Desktop)
+A tela inicial apresenta o saldo total consolidado das contas ativas, métricas resumidas de clientes e contas cadastradas, atalhos para operações frequentes e listagem das contas em destaque:
+
+![Visão Geral em Tema Claro (Desktop)](docs/img/visao-geral-claro-1280x900.png)
+
+### 3.2 Grade de Contas Correntes (Tema Escuro — Desktop)
+Grade responsiva de cartões de contas bancárias, exibindo número da conta, saldo em destaque formatado em BRL (`tabular-nums`), chip de situação e ações rápidas (ativação, desativação, consulta e remoção com diálogo de confirmação):
+
+![Contas Correntes em Tema Escuro (Desktop)](docs/img/contas-escuro-1280x900.png)
+
+### 3.3 Fluxo Guiado de Transferência em 3 Passos (Mobile)
+Para garantir segurança e prevenir erros operacionais em transações financeiras, o processo de transferência opera em 3 passos estruturados:
+1. **Seleção e Valor:** Escolha das contas de origem e destino via seletores com exibição de saldos em tempo real e validações imediatas;
+2. **Revisão:** Confirmação detalhada da transação antes do envio, com visualização do impacto imediato no saldo da conta debitada;
+3. **Recibo:** Comprovante da operação com data/hora, identificadores e saldos atualizados, com retorno visual imediato.
+
+| Passo 2: Revisão da Transferência (Mobile Claro) | Passo 3: Recibo de Confirmação (Mobile Claro) |
+|:---:|:---:|
+| ![Revisão da Transferência](docs/img/transferir-revisao-claro-390x844.png) | ![Recibo da Transferência](docs/img/transferir-recibo-claro-390x844.png) |
+
+---
+
+## 4. Como Executar a Aplicação
+
+### 4.1 Pré-requisitos
 - **Docker** e **Docker Compose** instalados na máquina.
 
-### 3.2 Inicialização com Docker Compose
+### 4.2 Inicialização com Docker Compose
 Para compilar as imagens e iniciar os serviços em segundo plano:
 
 ```bash
@@ -120,7 +149,7 @@ docker compose up --build
 > sg docker -c "docker compose up --build"
 > ```
 
-### 3.3 Acesso aos Serviços
+### 4.3 Acesso aos Serviços
 - **Aplicação Web (Interface do Usuário):** [http://localhost:3000](http://localhost:3000)
 - **Endpoint de Saúde (Healthcheck via Nginx):** [http://localhost:3000/api/health](http://localhost:3000/api/health)
 - **API REST (Clientes):** [http://localhost:3000/api/clientes](http://localhost:3000/api/clientes)
@@ -128,7 +157,7 @@ docker compose up --build
 
 *Nota de Segurança:* Por arquitetura, a porta `8080` do backend não é publicada no computador hospedeiro (*host*). O backend comunica-se exclusivamente com o Nginx através da rede interna `banco-net`.
 
-### 3.4 Encerramento dos Containers
+### 4.4 Encerramento dos Containers
 Para interromper os containers preservando os dados cadastrados:
 ```bash
 docker compose down
@@ -141,32 +170,32 @@ docker compose down -v
 
 ---
 
-## 4. Como Executar os Testes
+## 5. Como Executar os Testes
 
 O projeto conta com suítes de teste automatizadas cobrindo todos os níveis da pirâmide de testes.
 
-### 4.1 Testes do Backend (Unidade, Contratos e HTTP)
+### 5.1 Testes do Backend (Unidade, Contratos e HTTP)
 Executa a suíte de testes unitários do domínio, testes de conformidade de contrato entre repositórios SQLite/Memória e testes de integração HTTP via `httptest`:
 ```bash
 cd backend
 go test -v ./...
 ```
 
-### 4.2 Testes de BDD (Gherkin em Português)
+### 5.2 Testes de BDD (Gherkin em Português)
 Executa os 18 cenários de teste orientados a comportamento (Behavior-Driven Development) com 85 steps utilizando `godog`:
 ```bash
 cd backend
 go test -v ./tests/bdd
 ```
 
-### 4.3 Testes do Frontend (Vitest + RTL + MSW)
-Executa os 26 testes de comportamento e renderização de componentes de interface com mocks de rede MSW:
+### 5.3 Testes do Frontend (Vitest + RTL + MSW)
+Executa os 33 testes de comportamento, acessibilidade, formatação e renderização de componentes de interface com mocks de rede MSW:
 ```bash
 cd frontend
 npm test
 ```
 
-### 4.4 Testes Ponta a Ponta (Playwright E2E)
+### 5.4 Testes Ponta a Ponta (Playwright E2E)
 Executa o fluxo completo de ponta a ponta no navegador contra os containers ativos em `http://localhost:3000`:
 ```bash
 # Certifique-se de que a aplicação está rodando (docker compose up)
@@ -176,7 +205,7 @@ npm run e2e
 
 ---
 
-## 5. Matriz de Rastreabilidade (Requisito → Testes)
+## 6. Matriz de Rastreabilidade (Requisito → Testes)
 
 Todos os requisitos funcionais originais do sistema bancário (R01 a R12) e as extensões acordadas foram formalmente mapeados e validados nas suítes automatizadas:
 
@@ -193,11 +222,11 @@ Todos os requisitos funcionais originais do sistema bancário (R01 a R12) e as e
 | **R09** | Cadastrar nova conta corrente | `domain/conta/conta_test.go`<br>`application/conta/servico_test.go`<br>`tests/contract/contratos_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (cadastro numérico e id duplicado) | `e2e/fluxo-bancario.spec.js` (cadastro pela interface) | Concluído |
 | **R10** | Exibir e consultar situação da conta | `domain/conta/conta_test.go`<br>`application/conta/operacoes_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (exibição e consulta de Ativa/Inativa) | — | Concluído |
 | **R11** | Remover conta corrente | `application/conta/operacoes_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (ação de remoção na listagem) | — | Concluído |
-| **R12** | Transferir valores entre contas (8 condições: saldo, valor, contas ativas e bloqueio de mesma conta) | `domain/conta/transferencia_test.go` (mesma conta — ADR-018)<br>`exploratorio_test.go`<br>`application/conta/servico_test.go`<br>`transferencia_uow_test.go`<br>`features/transferir_valores.feature` (7 cenários)<br>`adapters/http/router_test.go` (422 `mesma_conta`) | `contas/componentes.test.jsx` (sucesso e atualização de saldos)<br>`tests/app.test.jsx` (erros tipados) | `e2e/fluxo-bancario.spec.js` (transferência ponta a ponta e checagem de saldos) | Concluído |
+| **R12** | Transferir valores entre contas (8 condições: saldo, valor, contas ativas e bloqueio de mesma conta) | `domain/conta/transferencia_test.go` (mesma conta — ADR-018)<br>`exploratorio_test.go`<br>`application/conta/servico_test.go`<br>`transferencia_uow_test.go`<br>`features/transferir_valores.feature` (7 cenários)<br>`adapters/http/router_test.go` (422 `mesma_conta`) | `contas/componentes.test.jsx` (fluxo em 3 passos: form, revisão e recibo)<br>`tests/app.test.jsx` (erros tipados) | `e2e/fluxo-bancario.spec.js` (transferência ponta a ponta e checagem de saldos) | Concluído |
 
 ---
 
-## 6. Segurança e Endurecimento da Aplicação
+## 7. Segurança e Endurecimento da Aplicação
 
 Durante a fase de qualidade e revisões técnicas, a aplicação recebeu endurecimento em múltiplas camadas em conformidade com as decisões arquiteturais [ADR-018](docs/decisoes.md#adr-018) e [ADR-019](docs/decisoes.md#adr-019):
 
@@ -211,17 +240,17 @@ Durante a fase de qualidade e revisões técnicas, a aplicação recebeu endurec
 
 ---
 
-## 7. Desenvolvimento com Inteligência Artificial e Metodologia Multi-Agente (ORCA)
+## 8. Desenvolvimento com Inteligência Artificial e Metodologia Multi-Agente (ORCA)
 
 Este projeto foi conduzido por uma equipe de agentes autônomos de Inteligência Artificial coordenada pelo usuário através do protocolo **ORCA**:
 
-### 7.1 Papéis e Especialização da Equipe
-- **Chief Architect / Coordinator (`claude` — Claude Opus 5.5):** Responsável pela arquitetura do sistema, planejamento de fases (P001 a P007), elaboração dos contratos de trabalho, supervisão contínua do ciclo de entrega, decisões de ADR e merge final dos Pull Requests.
-- **Software Engineer / Implementer (`codex` — gpt-5.6-terra e posteriormente gpt-5.6-luna, alternado por limite de uso):** Responsável pela codificação do backend em Go, suítes de teste, cenários BDD em `godog`, frontend React/Vite, Dockerfiles e testes Playwright E2E.
+### 8.1 Papéis e Especialização da Equipe
+- **Chief Architect / Coordinator (`claude` — Claude Opus 5.5):** Responsável pela arquitetura do sistema, planejamento de fases (P001 a P008), elaboração dos contratos de trabalho, supervisão contínua do ciclo de entrega, decisões de ADR e merge final dos Pull Requests.
+- **Software Engineer / Implementer (`codex` — gpt-5.6-terra e posteriormente gpt-5.6-luna, alternado por limite de uso):** Responsável pela codificação do backend em Go, suítes de teste, cenários BDD em `godog`, frontend React/Vite com redesign na P008, Dockerfiles e testes Playwright E2E.
 - **Tester & Code Reviewer (`agy` — Antigravity CLI com Gemini 4 Argon / Gemini 3.8 Flash):** Revisor independente atuando em worktree isolado. Conduziu análises estáticas e dinâmicas, validação de critérios de aceite contra commits do branch e aplicação de pedidos de alteração (`CHANGES_REQUESTED`) perante inconsistências.
 - **Documentarian & Summarizer (`agy-doc` — Antigravity CLI com Gemini 4 Argon / Gemini 3.8 Flash):** Responsável pela rastreabilidade contínua, auditoria de conformidade entre código e documentação, manutenção do grafo de conhecimento (Graphify), síntese do projeto (`SUMMARY.md`), catálogo de lições aprendidas (`LESSONS_LEARNED.md`) e documentação final de entrega.
 
-### 7.2 Disciplina e Rastreabilidade do TDD no Histórico Git
+### 8.2 Disciplina e Rastreabilidade do TDD no Histórico Git
 Conforme estipulado no [ADR-008](docs/decisoes.md#adr-008), a evidência do desenvolvimento guiado por testes baseia-se no histórico auditável de commits do repositório:
 - Commits `test: RED`: Introduzem testes automatizados com falha antes da implementação do recurso.
 - Commits `feat: GREEN`: Fornecem a implementação funcional mínima para aprovação dos testes.
@@ -231,7 +260,7 @@ A maior parte das funcionalidades seguiu a alternância RED → GREEN. Conforme 
 
 ---
 
-## 8. Limitações Conhecidas
+## 9. Limitações Conhecidas
 
 - **Ponto flutuante para valores monetários (`float64`):** Mantido por paridade com o sistema original em Java ([ADR-003](docs/decisoes.md#adr-003)). Embora salvaguardas de saldo finito (`math.IsNaN`, `math.IsInf`) tenham sido implementadas para rejeitar estouros numéricos, o tipo não substitui tipos decimais de precisão arbitrária recomendados para sistemas bancários de grande escala.
 - **Mensagens de erro do backend sem acentuação:** As mensagens textuais de erro retornadas pela API REST em Go não possuem acentuação gráfica (por exemplo: `"cliente nao encontrado"`, `"conta nao encontrada"` ou `"identificador duplicado"`), embora os códigos de status HTTP e os identificadores JSON sejam estruturados e consistentes.
@@ -239,13 +268,14 @@ A maior parte das funcionalidades seguiu a alternância RED → GREEN. Conforme 
 
 ---
 
-## 9. Documentação Técnica Detalhada
+## 10. Documentação Técnica Detalhada
 
 A pasta [`docs/`](docs/) contém o conjunto integral de especificações técnicas do projeto:
 
 - [`docs/requisitos.md`](docs/requisitos.md): Detalhamento formal dos requisitos de negócio (R01 a R12 com 8 condições), regras não funcionais e dados iniciais de seed.
 - [`docs/arquitetura.md`](docs/arquitetura.md): Desenho arquitetural do backend hexagonal, handlers HTTP desacoplados, frontend componentizado e padrões de projeto.
-- [`docs/decisoes.md`](docs/decisoes.md): Catálogo completo das 19 Decisões Arquiteturais registradas (ADR-001 a ADR-019).
+- [`docs/design-frontend.md`](docs/design-frontend.md): Princípios visuais, tokens de design, acessibilidade WCAG 2.2 AA, fluxo guiado de transferência em 3 passos e decisões de implementação da interface.
+- [`docs/decisoes.md`](docs/decisoes.md): Catálogo completo das 20 Decisões Arquiteturais registradas (ADR-001 a ADR-020).
 - [`docs/api.md`](docs/api.md): Especificação completa dos contratos HTTP REST, payloads de entrada/saída e códigos de erro tipados.
 - [`docs/infra-docker.md`](docs/infra-docker.md): Especificação dos containers multi-stage, topologia de rede, healthcheck e persistência.
 - [`docs/estrategia-testes.md`](docs/estrategia-testes.md): Pirâmide de testes, cobertura por camadas e comandos de execução.
