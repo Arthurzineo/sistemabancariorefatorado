@@ -7,6 +7,7 @@ import { EmptyState } from "../../components/EmptyState.jsx";
 import { Skeleton } from "../../components/Skeleton.jsx";
 import { StatCard } from "../../components/StatCard.jsx";
 import { StatusChip } from "../../components/StatusChip.jsx";
+import { Button } from "../../components/Button.jsx";
 
 export default function VisaoGeral({ onNavigate }) {
   const [dados, setDados] = useState(null);
@@ -47,24 +48,15 @@ export default function VisaoGeral({ onNavigate }) {
         />
       </div>
       <div className="quick-actions">
-        <button
-          className="button button--primary"
-          onClick={() => onNavigate("transferir")}
-        >
+        <Button onClick={() => onNavigate("transferir")}>
           ＋ Nova transferência
-        </button>
-        <button
-          className="button button--primary"
-          onClick={() => onNavigate("contas")}
-        >
+        </Button>
+        <Button variant="secondary" onClick={() => onNavigate("contas")}>
           ＋ Nova conta
-        </button>
-        <button
-          className="button button--primary"
-          onClick={() => onNavigate("clientes")}
-        >
+        </Button>
+        <Button variant="secondary" onClick={() => onNavigate("clientes")}>
           ＋ Novo cliente
-        </button>
+        </Button>
       </div>
       <div className="section-heading">
         <h2>Contas em destaque</h2>

@@ -2,7 +2,7 @@ button.button {
   appearance: none;
   border: 1px solid transparent;
 }
-button:not(.icon-button) {
+button:not(.icon-button):not(.button) {
   appearance: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -11,16 +11,23 @@ button:not(.icon-button) {
   padding: var(--space-2) var(--space-4);
   font-weight: 700;
 }
-.button--secondary {
+.button.button--primary {
+  background: var(--accent);
+  color: #fff;
+}
+.button.button--primary:hover {
+  background: var(--accent-hover);
+}
+.button.button--secondary {
   background: var(--surface-2);
   color: var(--text);
   border-color: var(--border);
 }
-.button--ghost {
+.button.button--ghost {
   background: transparent;
   color: var(--accent);
 }
-.button--danger {
+.button.button--danger {
   background: var(--danger);
   color: #fff;
 }

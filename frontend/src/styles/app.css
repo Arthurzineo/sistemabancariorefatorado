@@ -101,7 +101,9 @@ select:focus-visible {
   min-width: 0;
   padding: var(--space-6) clamp(var(--space-4), 5vw, var(--space-8));
 }
-main { padding-bottom: 0; }
+main {
+  padding-bottom: 0;
+}
 .topbar {
   display: flex;
   align-items: center;
@@ -128,24 +130,6 @@ main { padding-bottom: 0; }
   border-radius: var(--radius-full);
   background: var(--surface);
   color: var(--text);
-}
-.button {
-  border: 0;
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-4);
-  font-weight: 700;
-}
-.button--primary {
-  background: var(--accent);
-  color: #fff;
-}
-.button--danger {
-  background: var(--danger);
-  color: #fff;
-}
-.button--ghost {
-  background: transparent;
-  color: var(--accent);
 }
 .card {
   padding: var(--space-5);
@@ -385,7 +369,9 @@ th:nth-child(3) {
   .content {
     padding: var(--space-4);
   }
-  main { padding-bottom: 5rem; }
+  main {
+    padding-bottom: 5rem;
+  }
   .stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
