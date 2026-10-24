@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "../../components/Button.jsx";
 
 const inicial = {
   id: "",
@@ -91,7 +92,7 @@ export default function CadastroCliente({ onCadastrar }) {
           onChange={alterar}
         />
       </label>
-      <button>Cadastrar cliente</button>
+      <Button type="submit">Cadastrar cliente</Button>
     </form>
   );
 }

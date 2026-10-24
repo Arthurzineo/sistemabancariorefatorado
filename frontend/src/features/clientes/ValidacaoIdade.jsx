@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Button } from "../../components/Button.jsx";
+import { Field } from "../../components/Field.jsx";
 export default function ValidacaoIdade({ onValidar }) {
   const [idade, setIdade] = useState("");
   return (
@@ -9,16 +11,15 @@ export default function ValidacaoIdade({ onValidar }) {
       }}
     >
       <h3>Validar idade</h3>
-      <label>
-        Idade para validar
-        <input
-          type="number"
-          value={idade}
-          onChange={(e) => setIdade(e.target.value)}
-          required
-        />
-      </label>
-      <button>Validar idade</button>
+      <Field
+        label="Idade para validar"
+        name="idade-validacao"
+        type="number"
+        value={idade}
+        onChange={(e) => setIdade(e.target.value)}
+        required
+      />
+      <Button>Validar idade</Button>
     </form>
   );
 }

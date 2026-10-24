@@ -1,3 +1,5 @@
-export default function Mensagem({ texto, erro = false }) {
-  return texto ? <p role={erro ? "alert" : "status"}>{texto}</p> : null;
+import { Toast } from "./Toast.jsx";
+
+export default function Mensagem({ texto, erro }) {
+  return <Toast texto={texto} erro={erro} />;
 }
