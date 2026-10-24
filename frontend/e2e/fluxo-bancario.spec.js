@@ -46,29 +46,37 @@ test("captura todas as telas nos temas claro e escuro", async ({ page }) => {
     await page.setViewportSize(viewport);
     const sufixo = `${viewport.width}x${viewport.height}`;
     async function capturar(tema) {
-      await page.evaluate((valor) => localStorage.setItem("tema", valor), tema);
+      await page.evaluate(() => localStorage.setItem("tema", "light"));
       await page.goto("/");
-      await page.evaluate((valor) => {
-        document.documentElement.dataset.theme = valor;
-      }, tema);
+      await page.waitForTimeout(100);
+      if (tema === "escuro")
+        await page.getByRole("button", { name: "Alternar tema" }).click();
+      await expect(page.locator("html")).toHaveAttribute(
+        "data-theme",
+        tema === "escuro" ? "dark" : "light",
+      );
+      const aplicarTema = async () => {};
       await page.screenshot({
         path: `e2e/screenshots/visao-geral-${tema}-${sufixo}.png`,
         fullPage: true,
       });
       await page.getByRole("button", { name: "Contas" }).click();
       await expect(page.getByText("Conta 1", { exact: true })).toBeVisible();
+      await aplicarTema();
       await page.screenshot({
         path: `e2e/screenshots/contas-${tema}-${sufixo}.png`,
         fullPage: true,
       });
       await page.getByRole("button", { name: "Clientes" }).click();
       await expect(page.getByText("Maria Silva")).toBeVisible();
+      await aplicarTema();
       await page.screenshot({
         path: `e2e/screenshots/clientes-${tema}-${sufixo}.png`,
         fullPage: true,
       });
       await page.getByRole("button", { name: "Transferir" }).click();
       await expect(page.getByText("Passo 1 de 3")).toBeVisible();
+      await aplicarTema();
       await page.screenshot({
         path: `e2e/screenshots/transferir-formulario-${tema}-${sufixo}.png`,
         fullPage: true,
@@ -83,6 +91,7 @@ test("captura todas as telas nos temas claro e escuro", async ({ page }) => {
       await page
         .getByRole("button", { name: "Revisar antes de transferir" })
         .click();
+      await aplicarTema();
       await page.screenshot({
         path: `e2e/screenshots/transferir-revisao-${tema}-${sufixo}.png`,
         fullPage: true,
@@ -91,6 +100,7 @@ test("captura todas as telas nos temas claro e escuro", async ({ page }) => {
         .getByRole("button", { name: "Confirmar transferência" })
         .click();
       await expect(page.getByText("Passo 3 de 3")).toBeVisible();
+      await aplicarTema();
       await page.screenshot({
         path: `e2e/screenshots/transferir-recibo-${tema}-${sufixo}.png`,
         fullPage: true,
