@@ -9,7 +9,7 @@
 O objetivo principal deste projeto é modernizar a arquitetura e a experiência de uso de um sistema bancário legado, originalmente implementado em Java 8 como aplicação de console monolítica, transformando-o em uma aplicação cliente-servidor distribuída:
 
 - **Backend:** Desenvolvido em **Go 1.25** adotando arquitetura hexagonal (*ports & adapters*) e princípios de MVC, sem frameworks pesados de roteamento, priorizando concisão e compilação estática.
-- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+) sem TypeScript ([ADR-004](docs/decisoes.md#adr-004)), componentização estrita por responsabilidade ([ADR-017](docs/decisoes.md#adr-017)), design system moderno com suporte a tema claro/escuro nativo (`light-dark()`), fluxo guiado de transferência em 3 passos e foco em acessibilidade WCAG 2.2 AA ([ADR-020](docs/decisoes.md#adr-020)).
+- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+) sem TypeScript ([ADR-004](docs/decisoes.md#adr-004)), componentização estrita por responsabilidade ([ADR-017](docs/decisoes.md#adr-017)), design system moderno com suporte a tema claro/escuro nativo (`light-dark()`), fluxo guiado de transferência em 3 passos e seguindo critérios da WCAG 2.2 AA definidos no design (alvos ≥ 44px, foco visível, contraste, rótulos e estados com ícone + texto; sem auditoria formal, [ADR-020](docs/decisoes.md#adr-020)).
 - **Persistência de Dados:** Base relacional **SQLite** com modo Write-Ahead Logging (WAL) acessada via DAO utilizando driver puro Go (`modernc.org/sqlite v1.58.0`, sem necessidade de CGO, [ADR-005](docs/decisoes.md#adr-005), [ADR-015](docs/decisoes.md#adr-015)), acompanhada de adaptador em memória (`memory`) com clonagem defensiva para testes rápidos.
 - **Transacionalidade e Atomicidade:** Operações de transferência atômica com reversão integral (*rollback*) em caso de falhas, coordenadas pelo padrão *Unit of Work*.
 - **Infraestrutura e Orquestração:** Empacotamento em **2 containers Docker** orquestrados por `docker compose`, executando como usuários de sistema sem privilégios de root (`app`, `uid=100`) em rede interna isolada `banco-net`.
@@ -94,7 +94,7 @@ A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a s
 - **`cmd/api/main.go`:** Ponto de entrada (*composition root*) configurando timeouts estritos no `http.Server` (ReadHeader, Read, Write, Idle) e graceful shutdown de 5 segundos via sinais `SIGINT`/`SIGTERM`.
 
 ### 2.2 Frontend em React (`frontend/`)
-- **`src/components/`:** Biblioteca de componentes base acessíveis (WCAG 2.2 AA) sem dependências externas: `Button` (variantes primary, secondary, danger e ghost), `Card`, `StatCard`, `StatusChip` (ícone + texto), `Field` (com rótulo e erro via `aria-describedby`), `Select`, `Dialog` (nativo `<dialog>` com captura e devolução de foco), `ConfirmDialog`, `Toast`, `EmptyState`, `Skeleton`, `Icon` (SVGs inline próprios) e `ThemeToggle`.
+- **`src/components/`:** Biblioteca de componentes base acessíveis sem dependências externas, seguindo critérios da WCAG 2.2 AA definidos no design (alvos ≥ 44px, foco visível com anel de 2px, rótulos associados e estados com ícone + texto; sem auditoria formal): `Button` (variantes primary, secondary, danger e ghost), `Card`, `StatCard`, `StatusChip` (ícone + texto), `Field` (com rótulo e erro via `aria-describedby`), `Select`, `Dialog` (nativo `<dialog>` com captura e devolução de foco), `ConfirmDialog`, `Toast`, `EmptyState`, `Skeleton`, `Icon` (SVGs inline próprios) e `ThemeToggle`.
 - **`src/features/visao/`:** Seção de Visão Geral com saldo total consolidado das contas ativas, cartões-resumo e atalhos rápidos de navegação.
 - **`src/features/clientes/`:** Componentes desacoplados para consulta por ID, cadastro com validação de idade imediata (18 a 65 anos), listagem tabular e gerenciamento de situação (ativar, desativar e remoção confirmada).
 - **`src/features/contas/`:** Componentes modulares para abertura de contas, grade responsiva de cartões de contas, consulta e formulário guiado de transferência.
@@ -108,7 +108,7 @@ A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a s
 
 ## 3. Interface da Aplicação
 
-A interface foi reformulada na fase **P008** ([ADR-020](docs/decisoes.md#adr-020)) adotando padrões modernos de aplicações financeiras (clareza hierárquica, dados em algarismos tabulares, estados explícitos com texto + ícone e prevenção de erros transacionais), com acessibilidade em nível **WCAG 2.2 AA**, suporte completo a tema claro e escuro e layout adaptativo para dispositivos móveis e desktops.
+A interface foi reformulada na fase **P008** ([ADR-020](docs/decisoes.md#adr-020)) adotando padrões modernos de aplicações financeiras (clareza hierárquica, dados em algarismos tabulares, estados explícitos com texto + ícone e prevenção de erros transacionais), seguindo critérios da WCAG 2.2 AA definidos no design (alvos ≥ 44px, foco visível, contraste, rótulos e estados com ícone + texto; sem auditoria formal), com suporte completo a tema claro e escuro e layout adaptativo para dispositivos móveis e desktops.
 
 ### 3.1 Visão Geral e Saldos Consolidados (Tema Claro — Desktop)
 A tela inicial apresenta o saldo total consolidado das contas ativas, métricas resumidas de clientes e contas cadastradas, atalhos para operações frequentes e listagem das contas em destaque:
@@ -265,6 +265,7 @@ A maior parte das funcionalidades seguiu a alternância RED → GREEN. Conforme 
 - **Ponto flutuante para valores monetários (`float64`):** Mantido por paridade com o sistema original em Java ([ADR-003](docs/decisoes.md#adr-003)). Embora salvaguardas de saldo finito (`math.IsNaN`, `math.IsInf`) tenham sido implementadas para rejeitar estouros numéricos, o tipo não substitui tipos decimais de precisão arbitrária recomendados para sistemas bancários de grande escala.
 - **Mensagens de erro do backend sem acentuação:** As mensagens textuais de erro retornadas pela API REST em Go não possuem acentuação gráfica (por exemplo: `"cliente nao encontrado"`, `"conta nao encontrada"` ou `"identificador duplicado"`), embora os códigos de status HTTP e os identificadores JSON sejam estruturados e consistentes.
 - **Ausência de autenticação e controle de acesso:** O sistema não implementa autenticação (tokens/sessões) ou perfis de autorização, uma vez que tais controles estavam fora do escopo do sistema de console legado.
+- **Acessibilidade sem auditoria formal:** A interface foi construída seguindo boas práticas e critérios da WCAG 2.2 AA definidos na especificação de design (alvos de toque ≥ 44×44px, `:focus-visible` com contraste 3:1, contraste de cores nos dois temas, rótulos associados via `aria-describedby`, `<dialog>` com gerenciamento de foco e estados com ícone + texto). Entretanto, não houve auditoria formal de acessibilidade por especialista humano ou certificação oficial.
 
 ---
 
