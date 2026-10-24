@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function temaInicial() {
   try {
@@ -10,6 +10,15 @@ function temaInicial() {
 
 export function ThemeToggle() {
   const [tema, setTema] = useState(temaInicial);
+
+  useEffect(() => {
+    const armazenado = temaInicial();
+    if (armazenado !== tema) {
+      setTema(armazenado);
+      return;
+    }
+    document.documentElement.dataset.theme = tema;
+  }, [tema]);
 
   function alternar() {
     const proximo = tema === "dark" ? "light" : "dark";

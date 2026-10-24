@@ -46,7 +46,11 @@ test("captura todas as telas nos temas claro e escuro", async ({ page }) => {
     await page.setViewportSize(viewport);
     const sufixo = `${viewport.width}x${viewport.height}`;
     async function capturar(tema) {
+      await page.evaluate((valor) => localStorage.setItem("tema", valor), tema);
       await page.goto("/");
+      await page.evaluate((valor) => {
+        document.documentElement.dataset.theme = valor;
+      }, tema);
       await page.screenshot({
         path: `e2e/screenshots/visao-geral-${tema}-${sufixo}.png`,
         fullPage: true,
@@ -92,8 +96,8 @@ test("captura todas as telas nos temas claro e escuro", async ({ page }) => {
         fullPage: true,
       });
     }
+    await page.goto("/");
     await capturar("claro");
-    await page.getByRole("button", { name: "Alternar tema" }).click();
     await capturar("escuro");
   }
 });

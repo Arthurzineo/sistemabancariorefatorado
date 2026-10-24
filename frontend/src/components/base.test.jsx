@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { StatusChip } from "./StatusChip.jsx";
 import { ThemeToggle } from "./ThemeToggle.jsx";
@@ -11,9 +12,10 @@ describe("componentes base", () => {
   });
 
   it("alterna o tema", async () => {
+    const user = userEvent.setup();
     render(<ThemeToggle />);
     const botao = screen.getByRole("button", { name: /tema/i });
-    botao.click();
+    await user.click(botao);
     expect(document.documentElement.dataset.theme).toBe("dark");
   });
 });
