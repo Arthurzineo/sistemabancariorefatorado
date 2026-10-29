@@ -1,282 +1,214 @@
-# Sistema Bancário Refatorado
+# Sistema Bancário: migração de Java para Go + React feita por agentes de IA
 
-> Aplicação web cliente-servidor para gerenciamento bancário e transferências atômicas, refatorada a partir de um sistema de console em Java 8. Desenvolvida com metodologias de engenharia de software (**TDD**, **BDD**, **DDD**, **Clean Architecture** e **Arquitetura Hexagonal**) e coordenada pelo usuário com o protocolo **ORCA**.
+Trabalho de aula: pegar um sistema bancário simples, de console, escrito em Java, e refatorá-lo
+para uma aplicação **cliente-servidor**:
+- backend em **Go**, com TDD, BDD e DDD;
+- frontend em **React**;
+- banco **SQLite**;
+- **2 containers Docker** ligados por uma rede.
 
----
+O código foi escrito por **uma equipe de agentes de IA**, coordenada pelo protocolo **ORCA**. Este
+README explica como a equipe foi organizada e como o trabalho fluiu. O sistema novo tem o seu
+próprio [README](sistema-novo/README.md).
 
-## 1. Visão Geral do Projeto
+## Estrutura do repositório
 
-O objetivo principal deste projeto é modernizar a arquitetura e a experiência de uso de um sistema bancário legado, originalmente implementado em Java 8 como aplicação de console monolítica, transformando-o em uma aplicação cliente-servidor distribuída:
-
-- **Backend:** Desenvolvido em **Go 1.25** adotando arquitetura hexagonal (*ports & adapters*) e princípios de MVC, sem frameworks pesados de roteamento, priorizando concisão e compilação estática.
-- **Frontend:** Desenvolvido em **React + Vite** com JavaScript moderno (HTML5/CSS3/ES6+) sem TypeScript ([ADR-004](docs/decisoes.md#adr-004)), componentização estrita por responsabilidade ([ADR-017](docs/decisoes.md#adr-017)), design system moderno com suporte a tema claro/escuro nativo (`light-dark()`), fluxo guiado de transferência em 3 passos e seguindo critérios da WCAG 2.2 AA definidos no design (alvos ≥ 44px, foco visível, contraste, rótulos e estados com ícone + texto; sem auditoria formal, [ADR-020](docs/decisoes.md#adr-020)).
-- **Persistência de Dados:** Base relacional **SQLite** com modo Write-Ahead Logging (WAL) acessada via DAO utilizando driver puro Go (`modernc.org/sqlite v1.58.0`, sem necessidade de CGO, [ADR-005](docs/decisoes.md#adr-005), [ADR-015](docs/decisoes.md#adr-015)), acompanhada de adaptador em memória (`memory`) com clonagem defensiva para testes rápidos.
-- **Transacionalidade e Atomicidade:** Operações de transferência atômica com reversão integral (*rollback*) em caso de falhas, coordenadas pelo padrão *Unit of Work*.
-- **Infraestrutura e Orquestração:** Empacotamento em **2 containers Docker** orquestrados por `docker compose`, executando como usuários de sistema sem privilégios de root (`app`, `uid=100`) em rede interna isolada `banco-net`.
-- **Regras e Testes Portados do Original:** As regras de negócio e os testes do sistema legado Java 8 (`../SistemaBancario_entrega/SistemaBancario`, mantido como especificação somente leitura) foram portados e validados no backend e frontend:
-  - 55 testes JUnit originais → portados para testes unitários em `backend/internal/domain/`, testes de contrato em `backend/tests/contract/` e testes HTTP em `backend/internal/adapters/http/`.
-  - 15 cenários BDD originais + 3 cenários adicionais (contas inativas e transferência para a mesma conta — [ADR-011](docs/decisoes.md#adr-011), [ADR-018](docs/decisoes.md#adr-018)) → portados para `backend/features/` e executados via `godog` em `backend/tests/bdd/`.
-
----
-
-## 2. Arquitetura do Sistema
-
-A arquitetura adota o padrão **Hexagonal (Ports & Adapters)** combinado com a semântica **MVC**:
-
-```
-                              ┌────────────────────────────────────────┐
-                              │            Navegador Web               │
-                              │       http://localhost:3000            │
-                              └──────────────────┬─────────────────────┘
-                                                 │
-                                                 │ HTTP
-                                                 ▼
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ Container Frontend (nginx:1.29-alpine — uid 100)                                       │
-│                                                                                        │
-│   ┌───────────────────────────┐         ┌──────────────────────────────────────────┐   │
-│   │   SPA React 19 (Vite)     │ ──────> │              Nginx Proxy                 │   │
-│   │   Assets estáticos HTML/JS│         │   proxy_pass http://backend:8080/api/    │   │
-│   └───────────────────────────┘         └────────────────────┬─────────────────────┘   │
-└──────────────────────────────────────────────────────────────┼─────────────────────────┘
-                                                               │ Rede bridge (banco-net)
-                                                               │ (porta 8080 interna)
-                                                               ▼
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ Container Backend (alpine:3.22 com binário estático Go — uid 100)                      │
-│                                                                                        │
-│  [Adapters - Driving / Controllers Desacoplados]                                       │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │ HTTP Router (net/http Go 1.22+)                                                  │  │
-│  │ cliente_handler.go | conta_handler.go | transferencia_handler.go                 │  │
-│  │ erros.go | json.go (MaxBytesReader 1 MiB -> 413, id_invalido -> 422)             │  │
-│  └─────────────────────────────────────────┬────────────────────────────────────────┘  │
-│                                            │ Invoca casos de uso                       │
-│  [Application Services]                    ▼                                           │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │ cliente.Servico  |  conta.Servico (Transferência com Unit of Work)               │  │
-│  └─────────────────────────────────────────┬────────────────────────────────────────┘  │
-│                                            │ Orquestra regras                          │
-│  [Domain Entities & Rules]                 ▼                                           │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │ Cliente (Idade 18-65) | ContaCorrente (Saldo Finito) | Transferencia (Atomicidade)│  │
-│  └─────────────────────────────────────────┬────────────────────────────────────────┘  │
-│                                            │ Utiliza portas                            │
-│  [Ports & Driven Adapters]                 ▼                                           │
-│  ┌───────────────────────────────┬──────────────────────────────────────────────────┐  │
-│  │ backend/internal/application/ │ SQLite DAO Adapter (modernc.org/sqlite v1.58.0   │  │
-│  │ ports (ClienteRepository,     │ com journal_mode(WAL))                           │  │
-│  │ ContaRepository, UnitOfWork)  │ Memory DAO Adapter (com cópias defensivas)       │  │
-│  └───────────────────────────────┴──────────────────────────┬───────────────────────┘  │
-└─────────────────────────────────────────────────────────────┼──────────────────────────┘
-                                                              │ Grava dados
-                                                              ▼
-                                            ┌──────────────────────────────────┐
-                                            │ Volume Persistente (banco-data)  │
-                                            │ Arquivo SQLite: /data/banco.db   │
-                                            └──────────────────────────────────┘
+```text
+.
+├── README.md              ← este arquivo: a metodologia da migração
+├── sistema-antigo/        ← o sistema original em Java 8 (console), sem alterações
+│   ├── src/               ← código de negócio
+│   ├── test/              ← testes JUnit 4 (tdd/, ddd/) e Cucumber (bdd/)
+│   └── docs/              ← relatórios em PDF e evidências do trabalho original
+└── sistema-novo/          ← o sistema migrado
+    ├── backend/           ← API em Go (arquitetura hexagonal)
+    ├── frontend/          ← interface em React + Vite
+    ├── docker-compose.yml ← sobe os 2 containers
+    ├── docs/              ← requisitos, arquitetura, API, decisões, testes
+    └── orca/              ← o "diário de bordo" da equipe de agentes (ver abaixo)
 ```
 
-### 2.1 Backend em Go (`backend/`)
-- **`internal/domain/`:** Entidades de domínio (`cliente`, `conta`), regras invariantes (idade válida entre 18 e 65 anos, validação de nome e e-mail não vazios, saldo sempre finito em `float64`), erros tipados de transferência (`saldo_insuficiente`, `valor_invalido`, `conta_origem_nao_encontrada`, `conta_destino_nao_encontrada`, `conta_origem_inativa`, `conta_destino_inativa`, `mesma_conta` — [ADR-018](docs/decisoes.md#adr-018)) e validações de unicidade.
-- **`internal/application/ports/`:** Contratos de abstração de dados (`ClienteRepository`, `ContaRepository`) e controle transacional (`UnitOfWork`).
-- **`internal/application/`:** Serviços de aplicação (`cliente.Servico` e `conta.Servico`), organizados por contexto delimitado ([ADR-016](docs/decisoes.md#adr-016)). Implementam os casos de uso de negócio e coordenam transações atômicas de transferência.
-- **`internal/adapters/sqlite/`:** Adaptador de persistência durável em SQLite operando em modo Write-Ahead Logging (`_pragma=journal_mode(WAL)`), com migrações automáticas de schema e controle transacional (`BEGIN`, `COMMIT`, `ROLLBACK`).
-- **`internal/adapters/memory/`:** Adaptador em memória com cópias defensivas (`Copia()`) para isolamento estrito de referências em suítes de teste de unidade.
-- **`internal/adapters/http/`:** Camada de transporte HTTP modular com handlers desacoplados por recurso:
-  - `router.go`: Registro central de rotas no ServeMux padrão do Go 1.22+.
-  - `cliente_handler.go`: Endpoints de clientes (`/api/clientes`, consulta, cadastro, validação de idade, ativação, desativação, situação e remoção).
-  - `conta_handler.go`: Endpoints de contas (`/api/contas`, consulta, cadastro, ativação, desativação, situação e remoção).
-  - `transferencia_handler.go`: Endpoint de transferência atômica (`/api/transferencias`) com Unit of Work.
-  - `erros.go`: Mapeamento centralizado de erros de domínio para códigos HTTP e resposta JSON padronizada.
-  - `json.go`: Decodificação e serialização com limite de 1 MiB (`http.MaxBytesReader` → 413) e validação de `id > 0` (422 `id_invalido`).
-- **`internal/seed/`:** Carga inicial idempotente de dados (clientes e contas padrão).
-- **`cmd/api/main.go`:** Ponto de entrada (*composition root*) configurando timeouts estritos no `http.Server` (ReadHeader, Read, Write, Idle) e graceful shutdown de 5 segundos via sinais `SIGINT`/`SIGTERM`.
+## Antes e depois
 
-### 2.2 Frontend em React (`frontend/`)
-- **`src/components/`:** Biblioteca de componentes base acessíveis sem dependências externas, seguindo critérios da WCAG 2.2 AA definidos no design (alvos ≥ 44px, foco visível com anel de 2px, rótulos associados e estados com ícone + texto; sem auditoria formal): `Button` (variantes primary, secondary, danger e ghost), `Card`, `StatCard`, `StatusChip` (ícone + texto), `Field` (com rótulo e erro via `aria-describedby`), `Select`, `Dialog` (nativo `<dialog>` com captura e devolução de foco), `ConfirmDialog`, `Toast`, `EmptyState`, `Skeleton`, `Icon` (SVGs inline próprios) e `ThemeToggle`.
-- **`src/features/visao/`:** Seção de Visão Geral com saldo total consolidado das contas ativas, cartões-resumo e atalhos rápidos de navegação.
-- **`src/features/clientes/`:** Componentes desacoplados para consulta por ID, cadastro com validação de idade imediata (18 a 65 anos), listagem tabular e gerenciamento de situação (ativar, desativar e remoção confirmada).
-- **`src/features/contas/`:** Componentes modulares para abertura de contas, grade responsiva de cartões de contas, consulta e formulário guiado de transferência.
-- **`src/features/contas/Transferencia.jsx`:** Fluxo transacional seguro em 3 passos: formulário de dados com visualização de saldos → tela de revisão antes da efetivação → recibo detalhado da operação.
-- **`src/lib/`:** Utilitários de formatação de moeda BRL com algarismos tabulares (`formato.js`) e mapeamento amigável de erros da API para português com acentuação (`erros.js`).
-- **`src/styles/`:** Sistema de estilos estruturado em tokens semânticos (`tokens.css`) com suporte a temas claro/escuro via `light-dark()` e preferência do sistema, formulários (`forms.css`), componentes (`components.css`) e layout responsivo (`app.css`).
-- **`src/components/*.test.jsx`, `src/features/*/componentes.test.jsx`, `src/lib/formato.test.js` e `tests/app.test.jsx`:** Suíte completa com **33 testes automatizados** utilizando **Vitest**, **React Testing Library** e **Mock Service Worker (MSW)** cobrindo acessibilidade, validações, componentes e integração.
-- **`e2e/fluxo-bancario.spec.js`:** Testes ponta a ponta reais com **Playwright** executando contra o ambiente conteinerizado e gerando capturas visuais desktop e mobile.
+| | Sistema antigo | Sistema novo |
+|---|---|---|
+| Tipo | Aplicação de console | Cliente-servidor (navegador + API REST) |
+| Linguagem | Java 8 | Go 1.25 (backend) e JavaScript/React 19 (frontend) |
+| Arquitetura | Classes de negócio + menu | Hexagonal (ports & adapters) + MVC |
+| Dados | Listas em memória | SQLite atrás de um adapter (troca fácil de banco) |
+| Testes | JUnit 4 + Cucumber 7 | `testing` do Go + godog, Vitest + MSW, Playwright |
+| Execução | `mvnw` | `docker compose up` (2 containers + rede) |
+| Operações | 12 | as mesmas 12, com as mesmas regras |
 
----
+Detalhes da migração:
+- [Requisitos migrados e como eles interagem](sistema-novo/docs/requisitos-migrados.md)
+- [Testes migrados de Java para Go](sistema-novo/docs/testes-migrados.md)
+- [Testes novos](sistema-novo/docs/testes-novos.md)
 
-## 3. Interface da Aplicação
+## Metodologia: uma equipe de agentes de IA
 
-A interface foi reformulada na fase **P008** ([ADR-020](docs/decisoes.md#adr-020)) adotando padrões modernos de aplicações financeiras (clareza hierárquica, dados em algarismos tabulares, estados explícitos com texto + ícone e prevenção de erros transacionais), seguindo critérios da WCAG 2.2 AA definidos no design (alvos ≥ 44px, foco visível, contraste, rótulos e estados com ícone + texto; sem auditoria formal), com suporte completo a tema claro e escuro e layout adaptativo para dispositivos móveis e desktops.
+### A equipe
 
-### 3.1 Visão Geral e Saldos Consolidados (Tema Claro — Desktop)
-A tela inicial apresenta o saldo total consolidado das contas ativas, métricas resumidas de clientes e contas cadastradas, atalhos para operações frequentes e listagem das contas em destaque:
+| Quem | Papel | O que fazia |
+|---|---|---|
+| **Arthur** (humano) | Dono do produto | Definiu o objetivo, os papéis de cada agente e as decisões de negócio (ex.: manter `float64` como no original, bloquear transferência com conta inativa, 2 containers, evidência de TDD pelos commits). Depois deixou a equipe trabalhar sozinha até o fim. |
+| **Claude** (Claude Code) | **Chief** (chefe) | Planejou as fases e tarefas, escreveu os contratos, distribuiu o trabalho e monitorou os agentes. Conferia cada entrega rodando os testes antes de aprovar o merge. |
+| **Codex** | **Worker** (programador) | Escreveu o código seguindo as tarefas, fase por fase, em ciclos TDD; abria um PR por fase. |
+| **Agy** | **Tester-reviewer** | Revisava o código do Codex, rodava e escrevia testes exploratórios num worktree separado e dava parecer. O Codex decidia se aceitava cada observação. |
+| **agy-doc** (2ª sessão do Agy) | **Documentarian + Summarizer** | Ao fim de cada fase, relia o repositório e atualizava a documentação, o resumo do projeto e as lições aprendidas. |
 
-![Visão Geral em Tema Claro (Desktop)](docs/img/visao-geral-claro-1280x900.png)
+### O protocolo ORCA
 
-### 3.2 Grade de Contas Correntes (Tema Escuro — Desktop)
-Grade responsiva de cartões de contas bancárias, exibindo número da conta, saldo em destaque formatado em BRL (`tabular-nums`), chip de situação e ações rápidas (ativação, desativação, consulta e remoção com diálogo de confirmação):
+ORCA é um protocolo para vários agentes trabalharem no mesmo projeto sem se atropelar. O estado
+do projeto fica em arquivos Markdown (a pasta [`sistema-novo/orca/`](sistema-novo/orca/)), não na
+memória dos agentes. Assim qualquer agente, inclusive um que acabou de ser aberto, sabe o que
+fazer.
 
-![Contas Correntes em Tema Escuro (Desktop)](docs/img/contas-escuro-1280x900.png)
+| Artefato | Para que serve | Onde |
+|---|---|---|
+| **Papéis** | O que cada função pode e não pode fazer | [`orca/roles/`](sistema-novo/orca/roles/) |
+| **Contratos** | Delegação formal: quem, qual papel, quais tarefas, quais skills ler antes, como reportar, critério de pronto | [`orca/contracts/`](sistema-novo/orca/contracts/) |
+| **Fases e tarefas** | Cada fase tem objetivo, critérios de entrada e saída; cada tarefa tem critérios de aceite | [`orca/phases/`](sistema-novo/orca/phases/) |
+| **Diários** | Registro de cada agente: o que fez, comandos, problemas, decisões | `orca/phases/*/diaries/` |
+| **Revisões** | Os pareceres do revisor, rodada por rodada | `orca/phases/*/reviews/` |
+| **Resumo e lições** | Estado consolidado e o que aprendemos | [`SUMMARY.md`](sistema-novo/orca/SUMMARY.md), [`LESSONS_LEARNED.md`](sistema-novo/orca/LESSONS_LEARNED.md) |
+| **Decisões (ADRs)** | Cada decisão de arquitetura ou negócio, com o motivo | [`docs/decisoes.md`](sistema-novo/docs/decisoes.md) (20 ADRs) |
 
-### 3.3 Fluxo Guiado de Transferência em 3 Passos (Mobile)
-Para garantir segurança e prevenir erros operacionais em transações financeiras, o processo de transferência opera em 3 passos estruturados:
-1. **Seleção e Valor:** Escolha das contas de origem e destino via seletores com exibição de saldos em tempo real e validações imediatas;
-2. **Revisão:** Confirmação detalhada da transação antes do envio, com visualização do impacto imediato no saldo da conta debitada;
-3. **Recibo:** Comprovante da operação com data/hora, identificadores e saldos atualizados, com retorno visual imediato.
+### Como os agentes conversavam
 
-| Passo 2: Revisão da Transferência (Mobile Claro) | Passo 3: Recibo de Confirmação (Mobile Claro) |
-|:---:|:---:|
-| ![Revisão da Transferência](docs/img/transferir-revisao-claro-390x844.png) | ![Recibo da Transferência](docs/img/transferir-recibo-claro-390x844.png) |
+Cada agente rodava no seu próprio terminal dentro do aplicativo **Orca**. As mensagens seguiam
+tipos fixos do protocolo:
+- `ORCA/ASSIGN` e `ORCA/GO`: entregar trabalho;
+- `ORCA/ACCEPT`: aceitar o trabalho recebido;
+- `ORCA/STATUS`: informar andamento;
+- `ORCA/REVIEW_REQUEST` e `ORCA/REVIEW_RESULT`: pedir e devolver revisão;
+- `ORCA/DONE`: avisar que a fase terminou.
 
----
+Os agentes mandavam mensagens para o Chief por um canal de orquestração (`orca orchestration send`).
+O Chief escrevia direto no terminal de cada agente (`orca terminal send`).
 
-## 4. Como Executar a Aplicação
+O ciclo de cada fase:
 
-### 4.1 Pré-requisitos
-- **Docker** e **Docker Compose** instalados na máquina.
+```mermaid
+sequenceDiagram
+  participant C as Claude (Chief)
+  participant X as Codex (programador)
+  participant A as Agy (revisor/testador)
+  participant D as agy-doc (documentação)
+  C->>X: ORCA/GO Pn (contrato + tarefas)
+  X->>X: TDD: commits RED → GREEN → REFACTOR
+  X->>X: abre PR da fase
+  X->>A: ORCA/REVIEW_REQUEST
+  A->>A: roda testes, escreve parecer
+  A->>X: ORCA/REVIEW_RESULT
+  X->>X: aceita ou recusa cada observação, corrige
+  X->>C: ORCA/DONE Pn
+  C->>C: roda os testes e confere os critérios de aceite
+  alt faltou algo
+    C->>X: CHANGES_REQUESTED (lista do que falta)
+  else tudo certo
+    C->>C: merge do PR
+    C->>D: ORCA/ASSIGN phase-review
+    D->>D: atualiza docs, resumo e lições
+    C->>X: ORCA/GO Pn+1
+  end
+```
 
-### 4.2 Inicialização com Docker Compose
-Para compilar as imagens e iniciar os serviços em segundo plano:
+### Execução autônoma e monitoramento
+
+Depois de dar os papéis, o Arthur pediu que a equipe fosse até a última fase sem pedir nada a ele.
+Para isso o Chief:
+- **Checava os agentes a cada 10 minutos**, seguindo um roteiro
+  ([`orca/state/chief-loop.md`](sistema-novo/orca/state/chief-loop.md)):
+  - processava a caixa de mensagens;
+  - lia a tela de cada terminal;
+  - destravava quem estivesse parado, esperando aprovação, sem limite de uso ou sem conseguir se
+    comunicar.
+- **Mantinha um auto-continue para o Codex**
+  ([`codex-autonudge.sh`](sistema-novo/orca/state/codex-autonudge.sh)). O Codex costumava encerrar
+  a vez no meio da fase. O script percebia que ele estava parado sem PR aberto e mandava continuar.
+
+### Conhecimento compartilhado: Graphify
+
+Os agentes usavam o **Graphify**, um grafo de conhecimento do projeto com código, docs e arquivos
+ORCA. Com ele respondiam perguntas como "o que depende do repositório de contas?" sem reler tudo.
+Todos usavam **o mesmo grafo**. Ele não está neste repositório porque é gerado automaticamente;
+a configuração está em [`orca/GRAPHIFY.md`](sistema-novo/orca/GRAPHIFY.md).
+
+### Engenharia aplicada pelo programador
+
+- **TDD**: para cada regra, um commit com o teste falhando (RED), outro com o código mínimo
+  (GREEN) e, se preciso, um de limpeza (REFACTOR). A prova é o histórico git.
+- **BDD**: os 15 cenários Gherkin do original, em português, rodando com godog, mais 3 cenários novos.
+- **DDD**: linguagem do domínio em português (`Cliente`, `ContaCorrente`, `Transferir`), situação
+  como tipo próprio, erros do domínio com nome.
+- **Arquitetura hexagonal**: o domínio não conhece banco nem HTTP. O SQLite e o adaptador em
+  memória implementam a mesma porta e passam pela mesma suíte de testes.
+
+## As fases
+
+| Fase | Objetivo | PR |
+|---|---|---|
+| P001 | Planejamento: análise do sistema antigo, requisitos, arquitetura, fases e contratos | — (só documentos) |
+| P002 | Domínio e casos de uso em Go (TDD/DDD) | #1 |
+| P003 | Persistência SQLite com adapter e Unit of Work | #2 |
+| P004 | API REST e BDD com godog | #3 |
+| P005 | Frontend React + testes de frontend | #4 |
+| P006 | Docker: 2 containers, rede e E2E com Playwright | #5 |
+| P007 | Revisão de qualidade e segurança, documentação de entrega | #6, #7 |
+| P008 | Redesign do frontend (pesquisa de design + implementação) | #8, #9 |
+
+Todo o trabalho aconteceu entre 22 e 24 de outubro de 2026: 9 PRs, 33 tarefas, 22 pareceres de
+revisão e 34 diários.
+
+## O que funcionou e o que não funcionou
+
+O registro completo está em [`LESSONS_LEARNED.md`](sistema-novo/orca/LESSONS_LEARNED.md)
+(14 lições). As principais:
+
+- **A revisão por outro agente não bastou.** Mais de uma vez o revisor aprovou PRs que não
+  cumpriam todos os critérios de aceite. Faltavam testes de rollback no SQLite, havia poucos testes
+  de frontend e o CSS deixava os botões principais sem cor. O que segurou a qualidade foi o Chief
+  rodar os testes e conferir os critérios antes de cada merge, pedindo correções quando faltava
+  algo (L-004, L-007, L-013).
+- **Agentes param sem avisar.** O programador encerrava a vez no meio da fase, sem PR e sem
+  reportar bloqueio. O monitor de 10 minutos e o auto-continue resolveram (L-005).
+- **O TDD pelos commits exige disciplina.** Na P004 alguns commits de código vieram antes do teste
+  RED; o Chief registrou a ressalva no aceite da fase (L-006).
+- **Cada agente precisa do seu espaço.** No começo o revisor trocou de branch dentro da pasta do
+  programador. Daí em diante cada um passou a trabalhar no seu próprio worktree do git.
+- **Escrever o estado em arquivos funciona.** Contratos, tarefas e diários permitiram retomar o
+  trabalho depois de travamentos, limites de uso e trocas de modelo sem perder contexto.
+
+## Limitações conhecidas
+
+- 4 dos 40 testes JUnit do original não têm equivalente em Go
+  ([detalhes](sistema-novo/docs/testes-migrados.md#4-o-que-não-foi-migrado)).
+- A revisão final de interface encontrou problemas de acabamento ainda não corrigidos:
+  - mensagens de erro do backend aparecem sem acento;
+  - os formulários de cadastro não são modais;
+  - a tabela de clientes rola para o lado em telas de 320 px;
+  - o tema não segue a preferência do sistema.
+- Os arquivos dentro de [`orca/`](sistema-novo/orca/) são um retrato fiel do processo. Por isso
+  citam caminhos da máquina original e a estrutura de pastas anterior a esta reorganização
+  (ex.: `sistemabancariorefatorado/backend` em vez de `sistema-novo/backend`).
+
+## Como rodar
 
 ```bash
-docker compose up --build
+cd sistema-novo
+docker compose up --build        # abre em http://localhost:3000
 ```
 
-> **Dica para ambiente Linux:** Se o seu usuário foi adicionado recentemente ao grupo `docker` e a sessão de terminal atual ainda não foi renovada, execute:
-> ```bash
-> sg docker -c "docker compose up --build"
-> ```
+Testes:
 
-### 4.3 Acesso aos Serviços
-- **Aplicação Web (Interface do Usuário):** [http://localhost:3000](http://localhost:3000)
-- **Endpoint de Saúde (Healthcheck via Nginx):** [http://localhost:3000/api/health](http://localhost:3000/api/health)
-- **API REST (Clientes):** [http://localhost:3000/api/clientes](http://localhost:3000/api/clientes)
-- **API REST (Contas):** [http://localhost:3000/api/contas](http://localhost:3000/api/contas)
-
-*Nota de Segurança:* Por arquitetura, a porta `8080` do backend não é publicada no computador hospedeiro (*host*). O backend comunica-se exclusivamente com o Nginx através da rede interna `banco-net`.
-
-### 4.4 Encerramento dos Containers
-Para interromper os containers preservando os dados cadastrados:
 ```bash
-docker compose down
+cd sistema-novo/backend && go test ./...           # unidade, contrato, HTTP e BDD
+cd sistema-novo/frontend && npm ci && npm test     # Vitest
 ```
 
-Para interromper e **limpar o volume de dados** (`banco-data`), reiniciando o banco a partir do seed original:
+Sistema antigo (precisa de Java 8+):
+
 ```bash
-docker compose down -v
+cd sistema-antigo && ./mvnw test
 ```
-
----
-
-## 5. Como Executar os Testes
-
-O projeto conta com suítes de teste automatizadas cobrindo todos os níveis da pirâmide de testes.
-
-### 5.1 Testes do Backend (Unidade, Contratos e HTTP)
-Executa a suíte de testes unitários do domínio, testes de conformidade de contrato entre repositórios SQLite/Memória e testes de integração HTTP via `httptest`:
-```bash
-cd backend
-go test -v ./...
-```
-
-### 5.2 Testes de BDD (Gherkin em Português)
-Executa os 18 cenários de teste orientados a comportamento (Behavior-Driven Development) com 85 steps utilizando `godog`:
-```bash
-cd backend
-go test -v ./tests/bdd
-```
-
-### 5.3 Testes do Frontend (Vitest + RTL + MSW)
-Executa os 33 testes de comportamento, acessibilidade, formatação e renderização de componentes de interface com mocks de rede MSW:
-```bash
-cd frontend
-npm test
-```
-
-### 5.4 Testes Ponta a Ponta (Playwright E2E)
-Executa o fluxo completo de ponta a ponta no navegador contra os containers ativos em `http://localhost:3000`:
-```bash
-# Certifique-se de que a aplicação está rodando (docker compose up)
-cd frontend
-npm run e2e
-```
-
----
-
-## 6. Matriz de Rastreabilidade (Requisito → Testes)
-
-Todos os requisitos funcionais originais do sistema bancário (R01 a R12) e as extensões acordadas foram formalmente mapeados e validados nas suítes automatizadas:
-
-| Requisito | Descrição | Testes no Backend (Go) | Testes no Frontend (Vitest/MSW) | Testes E2E (Playwright) | Status |
-|---|---|---|---|---|---|
-| **R01** | Consultar cliente por ID | `application/cliente/casos_de_uso_test.go`<br>`features/consultar_cliente.feature`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (consulta existente e 404) | — | Concluído |
-| **R02** | Cadastrar novo cliente | `application/cliente/casos_de_uso_test.go`<br>`tests/contract/contratos_test.go`<br>`adapters/http/router_test.go`<br>`domain/cliente/cliente_security_test.go` | `clientes/componentes.test.jsx` (cadastro numérico e id duplicado) | `e2e/fluxo-bancario.spec.js` (cadastro pela interface) | Concluído |
-| **R03** | Validar idade do cliente (18 a 65 anos) | `domain/cliente/cliente_test.go`<br>`application/cliente/operacoes_test.go`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (menor 18, limite 18 OK, 66 rejeitado) | — | Concluído |
-| **R04** | Ativar cliente | `domain/cliente/cliente_test.go`<br>`application/cliente/operacoes_test.go`<br>`features/ativar_cliente.feature`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (ação de ativação na listagem) | — | Concluído |
-| **R05** | Desativar cliente | `domain/cliente/cliente_test.go`<br>`application/cliente/operacoes_test.go`<br>`features/desativar_cliente.feature`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (ação de desativação na listagem) | — | Concluído |
-| **R06** | Exibir situação do cliente | `application/cliente/operacoes_test.go`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (exibição de Ativo/Inativo) | — | Concluído |
-| **R07** | Remover cliente | `application/cliente/casos_de_uso_test.go`<br>`adapters/http/router_test.go` | `clientes/componentes.test.jsx` (ação de remoção na listagem) | — | Concluído |
-| **R08** | Consultar conta corrente por ID | `application/conta/servico_test.go`<br>`features/consultar_conta.feature`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (consulta existente e 404) | — | Concluído |
-| **R09** | Cadastrar nova conta corrente | `domain/conta/conta_test.go`<br>`application/conta/servico_test.go`<br>`tests/contract/contratos_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (cadastro numérico e id duplicado) | `e2e/fluxo-bancario.spec.js` (cadastro pela interface) | Concluído |
-| **R10** | Exibir e consultar situação da conta | `domain/conta/conta_test.go`<br>`application/conta/operacoes_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (exibição e consulta de Ativa/Inativa) | — | Concluído |
-| **R11** | Remover conta corrente | `application/conta/operacoes_test.go`<br>`adapters/http/router_test.go` | `contas/componentes.test.jsx` (ação de remoção na listagem) | — | Concluído |
-| **R12** | Transferir valores entre contas (8 condições: saldo, valor, contas ativas e bloqueio de mesma conta) | `domain/conta/transferencia_test.go` (mesma conta — ADR-018)<br>`exploratorio_test.go`<br>`application/conta/servico_test.go`<br>`transferencia_uow_test.go`<br>`features/transferir_valores.feature` (7 cenários)<br>`adapters/http/router_test.go` (422 `mesma_conta`) | `contas/componentes.test.jsx` (fluxo em 3 passos: form, revisão e recibo)<br>`tests/app.test.jsx` (erros tipados) | `e2e/fluxo-bancario.spec.js` (transferência ponta a ponta e checagem de saldos) | Concluído |
-
----
-
-## 7. Segurança e Endurecimento da Aplicação
-
-Durante a fase de qualidade e revisões técnicas, a aplicação recebeu endurecimento em múltiplas camadas em conformidade com as decisões arquiteturais [ADR-018](docs/decisoes.md#adr-018) e [ADR-019](docs/decisoes.md#adr-019):
-
-- **Integridade Transacional (ADR-018):** Bloqueio estrito no domínio e na API de transferências entre uma conta e ela mesma (`ErrMesmaConta` → HTTP 422 `mesma_conta`), prevenindo corrupção de estado ou créditos indevidos (condição 8 do R12).
-- **Proteção contra DoS e Payloads Abusivos (ADR-019):** Limitação estrita do corpo de requisições HTTP a 1 MiB via `http.MaxBytesReader` em `json.go` (retornando HTTP 413 caso excedido).
-- **Timeouts no Servidor HTTP (ADR-019):** Configuração de `ReadHeaderTimeout: 5s`, `ReadTimeout: 10s`, `WriteTimeout: 15s` e `IdleTimeout: 60s` no `http.Server`, mitigando ataques de exaustão de conexões (*Slowloris*).
-- **Validação Estrita de Identificadores e Entradas:** Rejeição de identificadores menores ou iguais a zero com HTTP 422 `id_invalido`; rejeição no domínio de clientes com nomes ou e-mails vazios ou puramente em branco.
-- **Cabeçalhos de Segurança HTTP no Nginx:** Inclusão de `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin` e supressão da versão do servidor com `server_tokens off`.
-- **Execução Não-Root:** Ambos os containers Docker (`backend` em Alpine 3.22 e `frontend` em Nginx 1.29-alpine) executam como usuário de sistema restrito `app` (`uid=100`).
-- **Resiliência de Persistência no SQLite:** Habilitação do modo Write-Ahead Logging (`_pragma=journal_mode(WAL)`) no SQLite, assegurando isolamento de leituras concorrentes e proteção contra falhas abruptas.
-
----
-
-## 8. Desenvolvimento com Inteligência Artificial e Metodologia Multi-Agente (ORCA)
-
-Este projeto foi conduzido por uma equipe de agentes autônomos de Inteligência Artificial coordenada pelo usuário através do protocolo **ORCA**:
-
-### 8.1 Papéis e Especialização da Equipe
-- **Chief Architect / Coordinator (`claude` — Claude Opus 5.5):** Responsável pela arquitetura do sistema, planejamento de fases (P001 a P008), elaboração dos contratos de trabalho, supervisão contínua do ciclo de entrega, decisões de ADR e merge final dos Pull Requests.
-- **Software Engineer / Implementer (`codex` — gpt-5.6-terra e posteriormente gpt-5.6-luna, alternado por limite de uso):** Responsável pela codificação do backend em Go, suítes de teste, cenários BDD em `godog`, frontend React/Vite com redesign na P008, Dockerfiles e testes Playwright E2E.
-- **Tester & Code Reviewer (`agy` — Antigravity CLI com Gemini 4 Argon / Gemini 3.8 Flash):** Revisor independente atuando em worktree isolado. Conduziu análises estáticas e dinâmicas, validação de critérios de aceite contra commits do branch e aplicação de pedidos de alteração (`CHANGES_REQUESTED`) perante inconsistências.
-- **Documentarian & Summarizer (`agy-doc` — Antigravity CLI com Gemini 4 Argon / Gemini 3.8 Flash):** Responsável pela rastreabilidade contínua, auditoria de conformidade entre código e documentação, manutenção do grafo de conhecimento (Graphify), síntese do projeto (`SUMMARY.md`), catálogo de lições aprendidas (`LESSONS_LEARNED.md`) e documentação final de entrega.
-
-### 8.2 Disciplina e Rastreabilidade do TDD no Histórico Git
-Conforme estipulado no [ADR-008](docs/decisoes.md#adr-008), a evidência do desenvolvimento guiado por testes baseia-se no histórico auditável de commits do repositório:
-- Commits `test: RED`: Introduzem testes automatizados com falha antes da implementação do recurso.
-- Commits `feat: GREEN`: Fornecem a implementação funcional mínima para aprovação dos testes.
-- Commits `refactor`: Limpam e organizam a base preservando o comportamento observável.
-
-A maior parte das funcionalidades seguiu a alternância RED → GREEN. Conforme apontado nas revisões de código e registrado nas lições aprendidas (L-006), alguns commits de rotas e composição entraram sem commit RED predecessor (`be26f9d`, `afe8128`, `1ef9896`, `d682c9e` na fase P004 e `cce754d` na fase P005), tendo suas coberturas de teste consolidadas em commits subsequentes.
-
----
-
-## 9. Limitações Conhecidas
-
-- **Ponto flutuante para valores monetários (`float64`):** Mantido por paridade com o sistema original em Java ([ADR-003](docs/decisoes.md#adr-003)). Embora salvaguardas de saldo finito (`math.IsNaN`, `math.IsInf`) tenham sido implementadas para rejeitar estouros numéricos, o tipo não substitui tipos decimais de precisão arbitrária recomendados para sistemas bancários de grande escala.
-- **Mensagens de erro do backend sem acentuação:** As mensagens textuais de erro retornadas pela API REST em Go não possuem acentuação gráfica (por exemplo: `"cliente nao encontrado"`, `"conta nao encontrada"` ou `"identificador duplicado"`), embora os códigos de status HTTP e os identificadores JSON sejam estruturados e consistentes.
-- **Ausência de autenticação e controle de acesso:** O sistema não implementa autenticação (tokens/sessões) ou perfis de autorização, uma vez que tais controles estavam fora do escopo do sistema de console legado.
-- **Acessibilidade sem auditoria formal:** A interface foi construída seguindo boas práticas e critérios da WCAG 2.2 AA definidos na especificação de design (alvos de toque ≥ 44×44px, `:focus-visible` com contraste 3:1, contraste de cores nos dois temas, rótulos associados via `aria-describedby`, `<dialog>` com gerenciamento de foco e estados com ícone + texto). Entretanto, não houve auditoria formal de acessibilidade por especialista humano ou certificação oficial.
-
----
-
-## 10. Documentação Técnica Detalhada
-
-A pasta [`docs/`](docs/) contém o conjunto integral de especificações técnicas do projeto:
-
-- [`docs/requisitos.md`](docs/requisitos.md): Detalhamento formal dos requisitos de negócio (R01 a R12 com 8 condições), regras não funcionais e dados iniciais de seed.
-- [`docs/arquitetura.md`](docs/arquitetura.md): Desenho arquitetural do backend hexagonal, handlers HTTP desacoplados, frontend componentizado e padrões de projeto.
-- [`docs/design-frontend.md`](docs/design-frontend.md): Princípios visuais, tokens de design, acessibilidade WCAG 2.2 AA, fluxo guiado de transferência em 3 passos e decisões de implementação da interface.
-- [`docs/decisoes.md`](docs/decisoes.md): Catálogo completo das 20 Decisões Arquiteturais registradas (ADR-001 a ADR-020).
-- [`docs/api.md`](docs/api.md): Especificação completa dos contratos HTTP REST, payloads de entrada/saída e códigos de erro tipados.
-- [`docs/infra-docker.md`](docs/infra-docker.md): Especificação dos containers multi-stage, topologia de rede, healthcheck e persistência.
-- [`docs/estrategia-testes.md`](docs/estrategia-testes.md): Pirâmide de testes, cobertura por camadas e comandos de execução.

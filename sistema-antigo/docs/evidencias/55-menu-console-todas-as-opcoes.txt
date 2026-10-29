@@ -1,0 +1,789 @@
+# Execucao real do menu do console (negocio.Main) passando pelas 12 opcoes.
+# Entrada: digitada via pipe (printf); as linhas de entrada aparecem abaixo em ENTRADA.
+# Comando: printf '...' | java -cp target/classes negocio.Main
+
+ENTRADA: 1 1  1 99  2 3 "Joao da Silva" 40 joao@x.com 3 s  2 3  2 4 Ana 17 ana@x 1 n  3 17  3 18  3 65  3 66  5 1  6 1  4 1  6 1  6 99  4 99  8 1  9 3 abc 250,75 n  9 1  10 3  10 99  12 1 2 30  12 1 2 1000  12 1 2 0  12 1 2 -5  12 1 99 10  12 99 1 10  12 3 1 50  11 3  8 3  11 3  7 3  1 3  7 3  x  42  0
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: =========================
+Id: 1
+Nome: Maria Silva
+Email: mariasilva@gmail.com
+Idade: 31
+Status: Ativo
+=========================
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente nao encontrado!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do novo cliente: Digite o nome: Digite a idade: Digite o email: Digite o ID da conta corrente do cliente: O cliente ja comeca ativo? (s/n): Cliente cadastrado com sucesso!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do novo cliente: Ja existe um cliente com o ID 3!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do novo cliente: Digite o nome: Digite a idade: Digite o email: Digite o ID da conta corrente do cliente: O cliente ja comeca ativo? (s/n): Cliente nao cadastrado: A idade do cliente precisa estar entre 18 e 65 anos.
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite a idade a validar: Idade 17 NAO permitida. A idade do cliente precisa estar entre 18 e 65 anos.
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite a idade a validar: Idade 18 permitida.
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite a idade a validar: Idade 65 permitida.
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite a idade a validar: Idade 66 NAO permitida. A idade do cliente precisa estar entre 18 e 65 anos.
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente desativado com sucesso!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Situacao do cliente 1: Inativo
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente ativado com sucesso!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Situacao do cliente 1: Ativo
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente nao encontrado!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente nao encontrado!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta: =========================
+Id: 1
+Saldo: 100.0
+Status: Ativa
+=========================
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o numero (ID) da nova conta: Digite o saldo inicial: Valor invalido! Digite um numero (ex.: 50 ou 10,50).
+Digite o saldo inicial: A conta ja comeca ativa? (s/n): Conta cadastrada com sucesso!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o numero (ID) da nova conta: Ja existe uma conta com o ID 1!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta: Situacao da conta 3: Inativa
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta: Conta nao encontrada!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta de origem: Digite o ID da conta de destino: Digite o valor a transferir: Transferencia realizada com sucesso!
+Saldo da conta 1: 70.0
+Saldo da conta 2: 130.0
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta de origem: Digite o ID da conta de destino: Digite o valor a transferir: Transferencia nao realizada: saldo insuficiente na conta de origem!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta de origem: Digite o ID da conta de destino: Digite o valor a transferir: Transferencia nao realizada: o valor precisa ser maior que zero!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta de origem: Digite o ID da conta de destino: Digite o valor a transferir: Transferencia nao realizada: o valor precisa ser maior que zero!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta de origem: Digite o ID da conta de destino: Digite o valor a transferir: Transferencia nao realizada: conta de destino nao encontrada!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta de origem: Digite o ID da conta de destino: Digite o valor a transferir: Transferencia nao realizada: conta de origem nao encontrada!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta de origem: Digite o ID da conta de destino: Digite o valor a transferir: Transferencia realizada com sucesso!
+Saldo da conta 3: 200.75
+Saldo da conta 1: 120.0
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta: Conta removida com sucesso!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta: Conta nao encontrada!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID da conta: Conta nao encontrada!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente removido com sucesso!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente nao encontrado!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Digite o ID do cliente: Cliente nao encontrado!
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+Opcao invalida! Digite o numero da opcao: Opcao invalida! Escolha um numero do menu.
+
+
+O que voce deseja fazer? 
+
+--- Clientes ---
+ 1) Consultar cliente
+ 2) Cadastrar cliente
+ 3) Validar idade do cliente
+ 4) Ativar cliente
+ 5) Desativar cliente
+ 6) Verificar situacao do cliente
+ 7) Remover cliente
+--- Contas correntes ---
+ 8) Consultar conta corrente
+ 9) Cadastrar conta corrente
+10) Verificar situacao da conta corrente
+11) Remover conta corrente
+12) Transferir valores entre contas
+----------------------
+ 0) Sair
+
+################# Sistema encerrado #################

@@ -1,0 +1,14 @@
+  ./mvnw clean compile
+  java -cp target/classes negocio.Main
+
+
+teste:
+
+# TDD (24 testes)
+  ./mvnw test -Dtest='tdd/*'
+
+  # BDD (15 cenários Cucumber)
+  ./mvnw test -Dtest=RunCucumberTest
+
+  # DDD (15 testes)
+  ./mvnw test -Dtest='ddd/*'

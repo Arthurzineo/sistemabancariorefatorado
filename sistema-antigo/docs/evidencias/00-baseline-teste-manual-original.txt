@@ -1,0 +1,38 @@
+$ javac -encoding UTF-8 -d bin src/negocio/*.java src/teste/*.java && java -cp bin teste.TesteUnitarioManual
+# codigo ORIGINAL, antes de qualquer alteracao - 2026-09-24 20:58:50
+
+--- Cliente ---
+[OK]     idade no limite inferior (18) e aceita
+[OK]     idade no limite superior (65) e aceita
+[OK]     idade 17 (abaixo do limite) deve ser rejeitada
+[OK]     idade 66 (acima do limite) deve ser rejeitada
+[OK]     cliente criado inativo mantem isAtivo() = false
+[OK]     setAtivo(true) reflete em isAtivo()
+[OK]     getIdContaCorrente() retorna o id informado
+--- ContaCorrente ---
+[OK]     saldo inicial e o informado no construtor
+[OK]     conta criada ativa mantem isAtivo() = true
+[OK]     setSaldo atualiza o saldo corretamente
+[OK]     setAtivo(false) reflete em isAtivo()
+[OK]     toString contem o saldo formatado
+--- GerenciadoraClientes ---
+[OK]     pesquisa encontra cliente existente
+[OK]     pesquisa retorna null para id inexistente
+[OK]     adiciona incrementa a lista de clientes
+[OK]     remove retorna true ao remover cliente existente
+[OK]     cliente removido nao e mais encontrado
+[OK]     remove retorna false para id inexistente
+[OK]     estaAtivo retorna true para cliente ativo
+--- GerenciadoraContas ---
+[OK]     transferencia com saldo suficiente retorna true
+[OK]     saldo da conta origem foi debitado
+[OK]     saldo da conta destino foi creditado
+[OK]     transferencia sem saldo suficiente retorna false
+[OK]     saldo da conta origem nao foi alterado apos falha
+[OK]     transferencia para conta inexistente retorna false (sem NullPointerException)
+
+========================================
+Total de testes: 25
+Falharam: 0
+Passaram: 25
+========================================

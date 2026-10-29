@@ -1,0 +1,19 @@
+$ ./mvnw -B test -Dtest=SaldoFinitoTest -Dsurefire.failIfNoSpecifiedTests=false
+# executado em 2026-09-24 21:58:31
+
+[INFO]   from pom.xml
+[INFO] Compiling 15 source files with javac [debug release 8] to target/classes
+[INFO] Compiling 12 source files with javac [debug release 8] to target/test-classes
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running tdd.SaldoFinitoTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in tdd.SaldoFinitoTest
+[INFO] Results:
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.174 s
+[INFO] Finished at: 2026-09-24T21:58:32-03:00
+[INFO] ------------------------------------------------------------------------

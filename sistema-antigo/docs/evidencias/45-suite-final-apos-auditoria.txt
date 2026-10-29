@@ -1,0 +1,24 @@
+$ ./mvnw clean test
+# execucao final apos as correcoes da auditoria - 2026-09-24 21:38:34
+
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in tdd.CadastroClienteTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in tdd.ValidacaoIdadeClienteTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in tdd.UnicidadeIdentificadorTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in tdd.TransferenciaTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in tdd.CadastroContaCorrenteTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in ddd.RemocaoTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in ddd.SituacaoContaCorrenteTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in ddd.SituacaoClienteTest
+15 Scenarios (15 passed)
+70 Steps (70 passed)
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.177 s -- in bdd.RunCucumberTest
+[INFO] Tests run: 51, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  1.257 s
+
+$ java -cp target/classes teste.TesteUnitarioManual
+========================================
+Total de testes: 25
+Falharam: 0
+Passaram: 25
+========================================

@@ -1,0 +1,30 @@
+$ ./mvnw -B test -Dtest=TransferenciaTest -Dsurefire.failIfNoSpecifiedTests=false
+# executado em 2026-09-24 21:01:28
+
+[INFO]   from pom.xml
+[INFO] Compiling 4 source files with javac [debug release 8] to target/test-classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/tdd/TransferenciaTest.java:[25,44] cannot find symbol
+  symbol:   method transferir(negocio.ContaCorrente,double)
+  location: variable origem of type negocio.ContaCorrente
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.572 s
+[INFO] Finished at: 2026-09-24T21:01:29-03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project sistema-bancario: Compilation failure
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/tdd/TransferenciaTest.java:[25,44] cannot find symbol
+[ERROR]   symbol:   method transferir(negocio.ContaCorrente,double)
+[ERROR]   location: variable origem of type negocio.ContaCorrente
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

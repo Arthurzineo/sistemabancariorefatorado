@@ -1,5 +1,6 @@
 # Go
-/backend/bin/
+sistema-novo/backend/bin/
+sistema-novo/backend/api
 *.test
 *.out
 coverage*.html
@@ -10,12 +11,15 @@ coverage*.html
 *.db-wal
 *.db-shm
 
-# Node / Vite
+# Node / Vite / Playwright
 node_modules/
-/frontend/dist/
-/frontend/coverage/
-/e2e/test-results/
-/e2e/playwright-report/
+sistema-novo/frontend/dist/
+sistema-novo/frontend/coverage/
+test-results/
+playwright-report/
+
+# Java (sistema antigo)
+sistema-antigo/target/
 
 # Ambiente / editores
 .env
@@ -24,4 +28,3 @@ node_modules/
 .DS_Store
 .idea/
 .vscode/
-backend/api

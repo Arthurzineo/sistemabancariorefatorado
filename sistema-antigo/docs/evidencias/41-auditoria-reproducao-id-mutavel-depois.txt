@@ -1,0 +1,16 @@
+# Mesma reproducao (38) contra o codigo DEPOIS da correcao: o id e final e nao ha setId
+# 2026-09-24 21:35:17
+
+$ javac -cp target/classes ReproducaoIdMutavel.java
+ReproducaoIdMutavel.java:11: error: cannot find symbol
+		a.setId(2);                                          // muda o id da conta ja cadastrada
+		 ^
+  symbol:   method setId(int)
+  location: variable a of type ContaCorrente
+ReproducaoIdMutavel.java:13: error: cannot find symbol
+		a.setId(1);                                          // restaura o id
+		 ^
+  symbol:   method setId(int)
+  location: variable a of type ContaCorrente
+2 errors
+(exit=1)

@@ -1,6 +1,6 @@
 # Requisitos — Sistema Bancário por IA
 
-Fonte: projeto original `../SistemaBancario_entrega/SistemaBancario` (Java 8, JUnit 4, Cucumber 7).
+Fonte: projeto original [`sistema-antigo/`](../../sistema-antigo) (Java 8, JUnit 4, Cucumber 7).
 Analisado em 2026-10-22. As regras abaixo foram extraídas do **código de domínio** e dos **testes**
 do original, e devem ser preservadas na migração (paridade de comportamento).
 
@@ -110,7 +110,7 @@ inválido, saldo insuficiente). A API nova retorna esse motivo como **erro tipad
 | R11 | `RemocaoTest` (conta) | `application/conta/operacoes_test.go`, `adapters/http/router_test.go` | `contas/componentes.test.jsx` (ação de remoção com dialog de confirmação) | — | Concluído |
 | R12 | `TransferenciaTest` (7 testes), `transferir_valores.feature` (4 cenários) | `domain/conta/transferencia_test.go` (inclui mesma conta — ADR-018), `exploratorio_test.go`, `application/conta/servico_test.go`, `transferencia_uow_test.go`, `features/transferir_valores.feature` (7 cenários), `adapters/http/router_test.go` (422 `mesma_conta`) | `contas/componentes.test.jsx` (transferência em 3 passos: form, revisão e recibo) + `tests/app.test.jsx` (erros tipados) | `e2e/fluxo-bancario.spec.js` (transferência entre contas e validação de saldos) | Concluído |
 
-Totais do original: 55 testes JUnit (incluindo runner) e 15 cenários BDD.
+Totais do original: 40 testes JUnit (métodos `@Test`) e 15 cenários BDD.
 Nas fases **P002**, **P003**, **P004**, **P005**, **P006**, **P007** e **P008**, todos os requisitos originais e as extensões de arquitetura e design foram validados:
 - **Backend:** 31 funções/suítes de teste automatizadas (unidade, persistência SQLite com WAL e memória, contratos e HTTP com handlers desacoplados e segurança) + 18 cenários BDD godog (85 steps).
 - **Frontend (P008 Redesign):** 33 testes automatizados (Vitest + React Testing Library + MSW) em 6 suítes cobrindo componentes base (`base.test.jsx`, `a11y.test.jsx`), formatação BRL (`formato.test.js`), clientes (`componentes.test.jsx`, 10 testes), contas e fluxo de transferência em 3 passos (`componentes.test.jsx`, 8 testes) e integração com navegação e erros tipados (`tests/app.test.jsx`, 8 testes).
