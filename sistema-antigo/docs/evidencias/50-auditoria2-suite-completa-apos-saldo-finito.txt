@@ -1,0 +1,148 @@
+$ ./mvnw -B test
+# executado em 2026-09-24 21:58:33
+
+[INFO]   from pom.xml
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running tdd.CadastroClienteTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in tdd.CadastroClienteTest
+[INFO] Running tdd.ValidacaoIdadeClienteTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in tdd.ValidacaoIdadeClienteTest
+[INFO] Running tdd.SaldoFinitoTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in tdd.SaldoFinitoTest
+[INFO] Running tdd.UnicidadeIdentificadorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in tdd.UnicidadeIdentificadorTest
+[INFO] Running tdd.TransferenciaTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in tdd.TransferenciaTest
+[INFO] Running tdd.CadastroContaCorrenteTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in tdd.CadastroContaCorrenteTest
+[INFO] Running ddd.RemocaoTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in ddd.RemocaoTest
+[INFO] Running ddd.SituacaoContaCorrenteTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s -- in ddd.SituacaoContaCorrenteTest
+[INFO] Running ddd.SituacaoClienteTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in ddd.SituacaoClienteTest
+[INFO] Running bdd.RunCucumberTest
+
+Cenário: Ativar cliente inativo                                       # features/ativar_cliente.feature:9
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está inativo                                # bdd.ClienteSteps.queOClienteEstaInativo(int)
+  Quando for solicitada a ativação do cliente de id 1                 # bdd.ClienteSteps.forSolicitadaAAtivacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar ativo                              # bdd.ClienteSteps.oClienteDeveraFicarAtivo(int)
+
+Cenário: Ativar cliente que já está ativo                             # features/ativar_cliente.feature:16
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está ativo                                  # bdd.ClienteSteps.queOClienteEstaAtivo(int)
+  Quando for solicitada a ativação do cliente de id 1                 # bdd.ClienteSteps.forSolicitadaAAtivacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar ativo                              # bdd.ClienteSteps.oClienteDeveraFicarAtivo(int)
+
+Cenário: Tentar ativar cliente inexistente             # features/ativar_cliente.feature:23
+  Dado que não existe cliente cadastrado com id 99     # bdd.ClienteSteps.queNaoExisteClienteCadastrado(int)
+  Quando for solicitada a ativação do cliente de id 99 # bdd.ClienteSteps.forSolicitadaAAtivacao(int)
+  Então a operação deverá ser rejeitada                # bdd.ClienteSteps.aOperacaoDeveraSerRejeitada()
+
+Cenário: Consultar cliente existente                                  # features/consultar_cliente.feature:9
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  Quando o operador consultar o cliente de id 1                       # bdd.ClienteSteps.oOperadorConsultarOCliente(int)
+  Então o sistema deverá retornar o cliente "Maria Silva"             # bdd.ClienteSteps.oSistemaDeveraRetornarOCliente(java.lang.String)
+
+Cenário: Consultar cliente inexistente                             # features/consultar_cliente.feature:14
+  Dado que não existe cliente cadastrado com id 99                 # bdd.ClienteSteps.queNaoExisteClienteCadastrado(int)
+  Quando o operador consultar o cliente de id 99                   # bdd.ClienteSteps.oOperadorConsultarOCliente(int)
+  Então o sistema deverá informar que o cliente não foi encontrado # bdd.ClienteSteps.oSistemaDeveraInformarClienteNaoEncontrado()
+
+Cenário: Consultar conta corrente ativa                                 # features/consultar_conta.feature:9
+  Dado que existe uma conta corrente cadastrada com id 1 e saldo 100,00 # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  Quando o operador consultar a conta de id 1                           # bdd.ContaSteps.oOperadorConsultarAConta(int)
+  Então o sistema deverá retornar a conta de id 1                       # bdd.ContaSteps.oSistemaDeveraRetornarAConta(int)
+  E o saldo exibido deverá ser 100,00                                   # bdd.ContaSteps.oSaldoExibidoDeveraSer(double)
+  E a situação exibida deverá ser "Ativa"                               # bdd.ContaSteps.aSituacaoExibidaDeveraSer(java.lang.String)
+
+Cenário: Consultar conta corrente inativa                              # features/consultar_conta.feature:16
+  Dado que existe uma conta corrente cadastrada com id 2 e saldo 50,00 # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  E que a conta de id 2 está inativa                                   # bdd.ContaSteps.queAContaEstaInativa(int)
+  Quando o operador consultar a conta de id 2                          # bdd.ContaSteps.oOperadorConsultarAConta(int)
+  Então o sistema deverá retornar a conta de id 2                      # bdd.ContaSteps.oSistemaDeveraRetornarAConta(int)
+  E o saldo exibido deverá ser 50,00                                   # bdd.ContaSteps.oSaldoExibidoDeveraSer(double)
+  E a situação exibida deverá ser "Inativa"                            # bdd.ContaSteps.aSituacaoExibidaDeveraSer(java.lang.String)
+
+Cenário: Consultar conta corrente inexistente                    # features/consultar_conta.feature:24
+  Dado que não existe conta corrente cadastrada com id 99        # bdd.ContaSteps.queNaoExisteContaCadastrada(int)
+  Quando o operador consultar a conta de id 99                   # bdd.ContaSteps.oOperadorConsultarAConta(int)
+  Então o sistema deverá informar que a conta não foi encontrada # bdd.ContaSteps.oSistemaDeveraInformarContaNaoEncontrada()
+
+Cenário: Desativar cliente ativo                                      # features/desativar_cliente.feature:9
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está ativo                                  # bdd.ClienteSteps.queOClienteEstaAtivo(int)
+  Quando for solicitada a desativação do cliente de id 1              # bdd.ClienteSteps.forSolicitadaADesativacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar inativo                            # bdd.ClienteSteps.oClienteDeveraFicarInativo(int)
+
+Cenário: Desativar cliente que já está inativo                        # features/desativar_cliente.feature:16
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está inativo                                # bdd.ClienteSteps.queOClienteEstaInativo(int)
+  Quando for solicitada a desativação do cliente de id 1              # bdd.ClienteSteps.forSolicitadaADesativacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar inativo                            # bdd.ClienteSteps.oClienteDeveraFicarInativo(int)
+
+Cenário: Tentar desativar cliente inexistente             # features/desativar_cliente.feature:23
+  Dado que não existe cliente cadastrado com id 99        # bdd.ClienteSteps.queNaoExisteClienteCadastrado(int)
+  Quando for solicitada a desativação do cliente de id 99 # bdd.ClienteSteps.forSolicitadaADesativacao(int)
+  Então a operação deverá ser rejeitada                   # bdd.ClienteSteps.aOperacaoDeveraSerRejeitada()
+
+Cenário: Transferência realizada com sucesso                               # features/transferir_valores.feature:13
+  Dado que existe uma conta corrente cadastrada com id 1 e saldo 100,00    # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  E que existe uma conta corrente cadastrada com id 2 e saldo 0,00         # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  Quando for solicitada a transferência de 40,00 da conta 1 para a conta 2 # bdd.ContaSteps.forSolicitadaATransferencia(double,int,int)
+  Então a transferência deverá ser realizada                               # bdd.ContaSteps.aTransferenciaDeveraSerRealizada()
+  E o saldo da conta 1 deverá ser 60,00                                    # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+  E o saldo da conta 2 deverá ser 40,00                                    # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+
+Cenário: Transferência sem saldo suficiente                                 # features/transferir_valores.feature:19
+  Dado que existe uma conta corrente cadastrada com id 1 e saldo 100,00     # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  E que existe uma conta corrente cadastrada com id 2 e saldo 0,00          # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  Quando for solicitada a transferência de 150,00 da conta 1 para a conta 2 # bdd.ContaSteps.forSolicitadaATransferencia(double,int,int)
+  Então a transferência deverá ser rejeitada                                # bdd.ContaSteps.aTransferenciaDeveraSerRejeitada()
+  E o saldo da conta 1 deverá ser 100,00                                    # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+  E o saldo da conta 2 deverá ser 0,00                                      # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+
+Esquema do Cenário: Transferência com valor inválido                      # features/transferir_valores.feature:33
+  Dado que existe uma conta corrente cadastrada com id 1 e saldo 100,00   # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  E que existe uma conta corrente cadastrada com id 2 e saldo 0,00        # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  Quando for solicitada a transferência de 0,00 da conta 1 para a conta 2 # bdd.ContaSteps.forSolicitadaATransferencia(double,int,int)
+  Então a transferência deverá ser rejeitada                              # bdd.ContaSteps.aTransferenciaDeveraSerRejeitada()
+  E o saldo da conta 1 deverá ser 100,00                                  # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+  E o saldo da conta 2 deverá ser 0,00                                    # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+
+Esquema do Cenário: Transferência com valor inválido                        # features/transferir_valores.feature:34
+  Dado que existe uma conta corrente cadastrada com id 1 e saldo 100,00     # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  E que existe uma conta corrente cadastrada com id 2 e saldo 0,00          # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  Quando for solicitada a transferência de -50,00 da conta 1 para a conta 2 # bdd.ContaSteps.forSolicitadaATransferencia(double,int,int)
+  Então a transferência deverá ser rejeitada                                # bdd.ContaSteps.aTransferenciaDeveraSerRejeitada()
+  E o saldo da conta 1 deverá ser 100,00                                    # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+  E o saldo da conta 2 deverá ser 0,00                                      # bdd.ContaSteps.oSaldoDaContaDeveraSer(int,double)
+
+15 Scenarios (15 passed)
+70 Steps (70 passed)
+0m0.089s
+
+
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.167 s -- in bdd.RunCucumberTest
+[INFO] Results:
+[INFO] Tests run: 54, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.845 s
+[INFO] Finished at: 2026-09-24T21:58:34-03:00
+[INFO] ------------------------------------------------------------------------
+
+$ java -cp target/classes teste.TesteUnitarioManual   # teste manual original (sem framework)
+========================================
+Total de testes: 25
+Falharam: 0
+Passaram: 25
+========================================

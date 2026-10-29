@@ -1,0 +1,246 @@
+$ ./mvnw -B test -Dtest=ddd.* -Dsurefire.failIfNoSpecifiedTests=false
+# executado em 2026-09-24 21:04:25
+
+[INFO]   from pom.xml
+[INFO] Compiling 10 source files with javac [debug release 8] to target/test-classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[17,15] cannot find symbol
+  symbol:   class SituacaoCliente
+  location: package negocio
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[17,15] cannot find symbol
+  symbol:   class SituacaoConta
+  location: package negocio
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[42,43] cannot find symbol
+  symbol:   method removerCliente(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[50,36] cannot find symbol
+  symbol:   method removerCliente(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[55,24] cannot find symbol
+  symbol:   method removerCliente(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[64,43] cannot find symbol
+  symbol:   method removerConta(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[72,36] cannot find symbol
+  symbol:   method removerConta(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[38,30] cannot find symbol
+  symbol:   variable SituacaoCliente
+  location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[38,60] cannot find symbol
+  symbol:   method getSituacao()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[39,35] cannot find symbol
+  symbol:   method estaAtivo()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[44,24] cannot find symbol
+  symbol:   method desativar()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[46,30] cannot find symbol
+  symbol:   variable SituacaoCliente
+  location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[46,62] cannot find symbol
+  symbol:   method getSituacao()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[47,36] cannot find symbol
+  symbol:   method estaAtivo()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[52,24] cannot find symbol
+  symbol:   method desativar()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[54,24] cannot find symbol
+  symbol:   method ativar()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[56,30] cannot find symbol
+  symbol:   variable SituacaoCliente
+  location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[56,60] cannot find symbol
+  symbol:   method getSituacao()
+  location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[63,26] cannot find symbol
+  symbol:   class SituacaoCliente
+  location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[63,61] cannot find symbol
+  symbol:   method verificarSituacaoCliente(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[65,42] cannot find symbol
+  symbol:   variable SituacaoCliente
+  location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[70,26] cannot find symbol
+  symbol:   class SituacaoCliente
+  location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[70,61] cannot find symbol
+  symbol:   method verificarSituacaoCliente(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[38,30] cannot find symbol
+  symbol:   variable SituacaoConta
+  location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[38,56] cannot find symbol
+  symbol:   method getSituacao()
+  location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[39,33] cannot find symbol
+  symbol:   method estaAtiva()
+  location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[46,30] cannot find symbol
+  symbol:   variable SituacaoConta
+  location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[46,65] cannot find symbol
+  symbol:   method getSituacao()
+  location: variable contaInativa of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[47,41] cannot find symbol
+  symbol:   method estaAtiva()
+  location: variable contaInativa of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[52,22] cannot find symbol
+  symbol:   method desativar()
+  location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[54,30] cannot find symbol
+  symbol:   variable SituacaoConta
+  location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[54,58] cannot find symbol
+  symbol:   method getSituacao()
+  location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[59,26] cannot find symbol
+  symbol:   class SituacaoConta
+  location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[59,59] cannot find symbol
+  symbol:   method verificarSituacaoConta(int)
+  location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[61,42] cannot find symbol
+  symbol:   variable SituacaoConta
+  location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[66,26] cannot find symbol
+  symbol:   class SituacaoConta
+  location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[66,59] cannot find symbol
+  symbol:   method verificarSituacaoConta(int)
+  location: variable sistema of type negocio.SistemaBancario
+[INFO] 37 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.654 s
+[INFO] Finished at: 2026-09-24T21:04:26-03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project sistema-bancario: Compilation failure: Compilation failure: 
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[17,15] cannot find symbol
+[ERROR]   symbol:   class SituacaoCliente
+[ERROR]   location: package negocio
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[17,15] cannot find symbol
+[ERROR]   symbol:   class SituacaoConta
+[ERROR]   location: package negocio
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[42,43] cannot find symbol
+[ERROR]   symbol:   method removerCliente(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[50,36] cannot find symbol
+[ERROR]   symbol:   method removerCliente(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[55,24] cannot find symbol
+[ERROR]   symbol:   method removerCliente(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[64,43] cannot find symbol
+[ERROR]   symbol:   method removerConta(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/RemocaoTest.java:[72,36] cannot find symbol
+[ERROR]   symbol:   method removerConta(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[38,30] cannot find symbol
+[ERROR]   symbol:   variable SituacaoCliente
+[ERROR]   location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[38,60] cannot find symbol
+[ERROR]   symbol:   method getSituacao()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[39,35] cannot find symbol
+[ERROR]   symbol:   method estaAtivo()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[44,24] cannot find symbol
+[ERROR]   symbol:   method desativar()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[46,30] cannot find symbol
+[ERROR]   symbol:   variable SituacaoCliente
+[ERROR]   location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[46,62] cannot find symbol
+[ERROR]   symbol:   method getSituacao()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[47,36] cannot find symbol
+[ERROR]   symbol:   method estaAtivo()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[52,24] cannot find symbol
+[ERROR]   symbol:   method desativar()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[54,24] cannot find symbol
+[ERROR]   symbol:   method ativar()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[56,30] cannot find symbol
+[ERROR]   symbol:   variable SituacaoCliente
+[ERROR]   location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[56,60] cannot find symbol
+[ERROR]   symbol:   method getSituacao()
+[ERROR]   location: variable cliente of type negocio.Cliente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[63,26] cannot find symbol
+[ERROR]   symbol:   class SituacaoCliente
+[ERROR]   location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[63,61] cannot find symbol
+[ERROR]   symbol:   method verificarSituacaoCliente(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[65,42] cannot find symbol
+[ERROR]   symbol:   variable SituacaoCliente
+[ERROR]   location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[70,26] cannot find symbol
+[ERROR]   symbol:   class SituacaoCliente
+[ERROR]   location: class ddd.SituacaoClienteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoClienteTest.java:[70,61] cannot find symbol
+[ERROR]   symbol:   method verificarSituacaoCliente(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[38,30] cannot find symbol
+[ERROR]   symbol:   variable SituacaoConta
+[ERROR]   location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[38,56] cannot find symbol
+[ERROR]   symbol:   method getSituacao()
+[ERROR]   location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[39,33] cannot find symbol
+[ERROR]   symbol:   method estaAtiva()
+[ERROR]   location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[46,30] cannot find symbol
+[ERROR]   symbol:   variable SituacaoConta
+[ERROR]   location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[46,65] cannot find symbol
+[ERROR]   symbol:   method getSituacao()
+[ERROR]   location: variable contaInativa of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[47,41] cannot find symbol
+[ERROR]   symbol:   method estaAtiva()
+[ERROR]   location: variable contaInativa of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[52,22] cannot find symbol
+[ERROR]   symbol:   method desativar()
+[ERROR]   location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[54,30] cannot find symbol
+[ERROR]   symbol:   variable SituacaoConta
+[ERROR]   location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[54,58] cannot find symbol
+[ERROR]   symbol:   method getSituacao()
+[ERROR]   location: variable conta of type negocio.ContaCorrente
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[59,26] cannot find symbol
+[ERROR]   symbol:   class SituacaoConta
+[ERROR]   location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[59,59] cannot find symbol
+[ERROR]   symbol:   method verificarSituacaoConta(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[61,42] cannot find symbol
+[ERROR]   symbol:   variable SituacaoConta
+[ERROR]   location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[66,26] cannot find symbol
+[ERROR]   symbol:   class SituacaoConta
+[ERROR]   location: class ddd.SituacaoContaCorrenteTest
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/ddd/SituacaoContaCorrenteTest.java:[66,59] cannot find symbol
+[ERROR]   symbol:   method verificarSituacaoConta(int)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

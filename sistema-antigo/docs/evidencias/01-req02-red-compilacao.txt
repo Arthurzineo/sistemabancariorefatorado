@@ -1,0 +1,36 @@
+$ ./mvnw -B test
+# executado em 2026-09-24 20:58:31
+
+[INFO]   from pom.xml
+[INFO] Compiling 1 source file with javac [debug target 1.8] to target/test-classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] bootstrap class path not set in conjunction with -source 8
+[INFO] 1 warning
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/tdd/CadastroClienteTest.java:[37,45] cannot find symbol
+  symbol:   method cadastrarCliente(negocio.Cliente)
+  location: variable sistema of type negocio.SistemaBancario
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.512 s
+[INFO] Finished at: 2026-09-24T20:58:32-03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project sistema-bancario: Compilation failure
+[ERROR] /home/arthur/Videos/TESTE DE SOFTWARE/ENS4003-TestedeSoftware(TurmaH)-Tarefa-ARTHURGONÇALVES (2)/Atividades_Refatoracao/SistemaBancario/SistemaBancario/test/java/tdd/CadastroClienteTest.java:[37,45] cannot find symbol
+[ERROR]   symbol:   method cadastrarCliente(negocio.Cliente)
+[ERROR]   location: variable sistema of type negocio.SistemaBancario
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

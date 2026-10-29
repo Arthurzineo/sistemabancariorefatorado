@@ -1,3 +1,4 @@
+name: sistemabancariorefatorado
 services:
   backend:
     build: ./backend

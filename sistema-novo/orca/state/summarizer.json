@@ -1,0 +1,24 @@
+{
+  "last_run": "2026-10-23T22:30:00-03:00",
+  "processed_diaries": {
+    ".orca/phases/001-planejamento/diaries/2026-10-22T2100_claude_P001.md": "2026-10-22T21:00:00-03:00",
+    ".orca/phases/002-dominio-backend/diaries/2026-10-22T2135_claude_P002.md": "2026-10-22T21:35:00-03:00",
+    ".orca/phases/003-persistencia-sqlite/diaries/2026-10-22T2220_claude_P003.md": "2026-10-22T22:20:00-03:00",
+    ".orca/phases/003-persistencia-sqlite/diaries/2026-10-23T0050_codex_P003.md": "2026-10-23T00:50:00-03:00",
+    ".orca/phases/004-api-http-bdd/diaries/2026-10-22T2245_agy_P004.md": "2026-10-22T22:45:00-03:00",
+    ".orca/phases/004-api-http-bdd/diaries/2026-10-23T0000_claude_P004.md": "2026-10-23T00:00:00-03:00",
+    ".orca/phases/005-frontend/diaries/2026-10-22T2253_agy_P005.md": "2026-10-22T22:53:00-03:00",
+    ".orca/phases/005-frontend/diaries/2026-10-23T0130_claude_P005.md": "2026-10-23T01:30:00-03:00",
+    ".orca/phases/006-docker/diaries/2026-10-23T2003_agy_P006.md": "2026-10-23T20:03:00-03:00",
+    ".orca/phases/006-docker/diaries/2026-10-23_claude_P006.md": "2026-10-23T20:10:00-03:00",
+    ".orca/phases/007-qualidade-entrega/diaries/2026-10-23_claude_P007.md": "2026-10-23T20:10:00-03:00",
+    ".orca/phases/007-qualidade-entrega/diaries/2026-10-23T2017_agy-doc_P007.md": "2026-10-23T20:17:00-03:00",
+    ".orca/phases/008-redesign-frontend/diaries/2026-10-23_claude_P008.md": "2026-10-23T21:34:00-03:00",
+    ".orca/phases/008-redesign-frontend/diaries/2026-10-23T2136_agy_P008.md": "2026-10-23T21:36:00-03:00",
+    ".orca/phases/008-redesign-frontend/diaries/2026-10-23T2225_agy-doc_P008.md": "2026-10-23T22:25:00-03:00"
+  },
+  "last_completed_phase": "P008",
+  "active_phase": "P008 (concluído)",
+  "last_completed_task": "phase-review-p008",
+  "current_task": "standby"
+}

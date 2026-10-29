@@ -1,0 +1,7 @@
+# Mesma reproducao (47) contra o codigo DEPOIS da correcao
+# 2026-09-24 21:58:43
+
+$ java -cp target/classes:. ReproducaoSaldoInfinito
+Exception in thread "main" java.lang.IllegalArgumentException: O saldo precisa ser um numero finito: Infinity
+	at negocio.ContaCorrente.validarSaldo(ContaCorrente.java:42)
+	at negocio.ContaCorrente.<init>(ContaCorrente.java:19)

@@ -1,0 +1,22 @@
+# Reproducao do achado da 2a auditoria (saldo nao finito na origem / via setSaldo), codigo ANTES da correcao
+# 2026-09-24 21:58:03
+
+import negocio.ContaCorrente;
+
+/** Reproducao do achado da auditoria: saldo infinito na ORIGEM. */
+public class ReproducaoSaldoInfinito {
+	public static void main(String[] args) {
+		ContaCorrente origem = new ContaCorrente(1, Double.POSITIVE_INFINITY, true);
+		ContaCorrente destino = new ContaCorrente(2, 0, true);
+		System.out.println("transferir(destino, 1.0) = " + origem.transferir(destino, 1.0)
+				+ " | saldo origem = " + origem.getSaldo());
+
+		ContaCorrente viaSetter = new ContaCorrente(3, 100, true);
+		viaSetter.setSaldo(Double.NaN);
+		System.out.println("setSaldo(NaN) aceito | saldo = " + viaSetter.getSaldo());
+	}
+}
+
+$ javac -cp target/classes ReproducaoSaldoInfinito.java && java -cp target/classes:. ReproducaoSaldoInfinito
+transferir(destino, 1.0) = true | saldo origem = Infinity
+setSaldo(NaN) aceito | saldo = NaN

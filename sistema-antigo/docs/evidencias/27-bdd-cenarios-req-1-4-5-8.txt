@@ -1,0 +1,83 @@
+$ ./mvnw -B test -Dtest=RunCucumberTest -Dsurefire.failIfNoSpecifiedTests=false
+# executado em 2026-09-24 21:03:45
+
+[INFO]   from pom.xml
+[INFO] Compiling 7 source files with javac [debug release 8] to target/test-classes
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running bdd.RunCucumberTest
+
+Cenário: Ativar cliente inativo                                       # features/ativar_cliente.feature:9
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está inativo                                # bdd.ClienteSteps.queOClienteEstaInativo(int)
+  Quando for solicitada a ativação do cliente de id 1                 # bdd.ClienteSteps.forSolicitadaAAtivacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar ativo                              # bdd.ClienteSteps.oClienteDeveraFicarAtivo(int)
+
+Cenário: Ativar cliente que já está ativo                             # features/ativar_cliente.feature:16
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está ativo                                  # bdd.ClienteSteps.queOClienteEstaAtivo(int)
+  Quando for solicitada a ativação do cliente de id 1                 # bdd.ClienteSteps.forSolicitadaAAtivacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar ativo                              # bdd.ClienteSteps.oClienteDeveraFicarAtivo(int)
+
+Cenário: Tentar ativar cliente inexistente             # features/ativar_cliente.feature:23
+  Dado que não existe cliente cadastrado com id 99     # bdd.ClienteSteps.queNaoExisteClienteCadastrado(int)
+  Quando for solicitada a ativação do cliente de id 99 # bdd.ClienteSteps.forSolicitadaAAtivacao(int)
+  Então a operação deverá ser rejeitada                # bdd.ClienteSteps.aOperacaoDeveraSerRejeitada()
+
+Cenário: Consultar cliente existente                                  # features/consultar_cliente.feature:9
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  Quando o operador consultar o cliente de id 1                       # bdd.ClienteSteps.oOperadorConsultarOCliente(int)
+  Então o sistema deverá retornar o cliente "Maria Silva"             # bdd.ClienteSteps.oSistemaDeveraRetornarOCliente(java.lang.String)
+
+Cenário: Consultar cliente inexistente                             # features/consultar_cliente.feature:14
+  Dado que não existe cliente cadastrado com id 99                 # bdd.ClienteSteps.queNaoExisteClienteCadastrado(int)
+  Quando o operador consultar o cliente de id 99                   # bdd.ClienteSteps.oOperadorConsultarOCliente(int)
+  Então o sistema deverá informar que o cliente não foi encontrado # bdd.ClienteSteps.oSistemaDeveraInformarClienteNaoEncontrado()
+
+Cenário: Consultar conta corrente existente                             # features/consultar_conta.feature:9
+  Dado que existe uma conta corrente cadastrada com id 1 e saldo 100,00 # bdd.ContaSteps.queExisteUmaContaCadastrada(int,double)
+  Quando o operador consultar a conta de id 1                           # bdd.ContaSteps.oOperadorConsultarAConta(int)
+  Então o sistema deverá retornar a conta de id 1                       # bdd.ContaSteps.oSistemaDeveraRetornarAConta(int)
+  E o saldo exibido deverá ser 100,00                                   # bdd.ContaSteps.oSaldoExibidoDeveraSer(double)
+
+Cenário: Consultar conta corrente inexistente                    # features/consultar_conta.feature:15
+  Dado que não existe conta corrente cadastrada com id 99        # bdd.ContaSteps.queNaoExisteContaCadastrada(int)
+  Quando o operador consultar a conta de id 99                   # bdd.ContaSteps.oOperadorConsultarAConta(int)
+  Então o sistema deverá informar que a conta não foi encontrada # bdd.ContaSteps.oSistemaDeveraInformarContaNaoEncontrada()
+
+Cenário: Desativar cliente ativo                                      # features/desativar_cliente.feature:9
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está ativo                                  # bdd.ClienteSteps.queOClienteEstaAtivo(int)
+  Quando for solicitada a desativação do cliente de id 1              # bdd.ClienteSteps.forSolicitadaADesativacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar inativo                            # bdd.ClienteSteps.oClienteDeveraFicarInativo(int)
+
+Cenário: Desativar cliente que já está inativo                        # features/desativar_cliente.feature:16
+  Dado que existe um cliente cadastrado com id 1 e nome "Maria Silva" # bdd.ClienteSteps.queExisteUmClienteCadastrado(int,java.lang.String)
+  E que o cliente de id 1 está inativo                                # bdd.ClienteSteps.queOClienteEstaInativo(int)
+  Quando for solicitada a desativação do cliente de id 1              # bdd.ClienteSteps.forSolicitadaADesativacao(int)
+  Então a operação deverá ser concluída com sucesso                   # bdd.ClienteSteps.aOperacaoDeveraSerConcluidaComSucesso()
+  E o cliente de id 1 deverá ficar inativo                            # bdd.ClienteSteps.oClienteDeveraFicarInativo(int)
+
+Cenário: Tentar desativar cliente inexistente             # features/desativar_cliente.feature:23
+  Dado que não existe cliente cadastrado com id 99        # bdd.ClienteSteps.queNaoExisteClienteCadastrado(int)
+  Quando for solicitada a desativação do cliente de id 99 # bdd.ClienteSteps.forSolicitadaADesativacao(int)
+  Então a operação deverá ser rejeitada                   # bdd.ClienteSteps.aOperacaoDeveraSerRejeitada()
+
+10 Scenarios (10 passed)
+39 Steps (39 passed)
+0m0.090s
+
+
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.210 s -- in bdd.RunCucumberTest
+[INFO] Results:
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.130 s
+[INFO] Finished at: 2026-09-24T21:03:46-03:00
+[INFO] ------------------------------------------------------------------------

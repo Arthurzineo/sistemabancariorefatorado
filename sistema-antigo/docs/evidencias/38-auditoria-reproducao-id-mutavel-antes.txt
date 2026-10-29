@@ -1,0 +1,23 @@
+# Reproducao do achado da auditoria (unicidade quebrada via setId), codigo ANTES da correcao
+# 2026-09-24 21:34:34
+
+import java.util.ArrayList;
+import negocio.*;
+
+/** Reproducao do achado da auditoria: unicidade quebrada via setId. */
+public class ReproducaoIdMutavel {
+	public static void main(String[] args) {
+		GerenciadoraContas contas = new GerenciadoraContas(new ArrayList<>());
+		SistemaBancario sistema = new SistemaBancario(new GerenciadoraClientes(new ArrayList<>()), contas);
+		ContaCorrente a = new ContaCorrente(1, 100, true);
+		sistema.cadastrarConta(a);
+		a.setId(2);                                          // muda o id da conta ja cadastrada
+		sistema.cadastrarConta(new ContaCorrente(1, 50, true)); // id 1 agora "livre"
+		a.setId(1);                                          // restaura o id
+		long comId1 = contas.listarTodos().stream().filter(c -> c.getId() == 1).count();
+		System.out.println("Contas com id 1 no repositorio: " + comId1);
+	}
+}
+
+$ javac -cp target/classes ReproducaoIdMutavel.java && java -cp target/classes:. ReproducaoIdMutavel
+Contas com id 1 no repositorio: 2

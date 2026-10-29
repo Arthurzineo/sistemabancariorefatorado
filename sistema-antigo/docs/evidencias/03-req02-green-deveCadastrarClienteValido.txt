@@ -1,0 +1,19 @@
+$ ./mvnw -B test -Dtest=CadastroClienteTest -Dsurefire.failIfNoSpecifiedTests=false
+# executado em 2026-09-24 20:59:10
+
+[INFO]   from pom.xml
+[INFO] Compiling 13 source files with javac [debug release 8] to target/classes
+[INFO] Compiling 1 source file with javac [debug release 8] to target/test-classes
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running tdd.CadastroClienteTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in tdd.CadastroClienteTest
+[INFO] Results:
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.907 s
+[INFO] Finished at: 2026-09-24T20:59:12-03:00
+[INFO] ------------------------------------------------------------------------

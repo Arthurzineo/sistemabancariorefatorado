@@ -1,0 +1,19 @@
+$ ./mvnw -B test -Dtest=TransferenciaTest -Dsurefire.failIfNoSpecifiedTests=false
+# executado em 2026-09-24 21:33:58
+
+[INFO]   from pom.xml
+[INFO] Compiling 15 source files with javac [debug release 8] to target/classes
+[INFO] Compiling 10 source files with javac [debug release 8] to target/test-classes
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running tdd.TransferenciaTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in tdd.TransferenciaTest
+[INFO] Results:
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.983 s
+[INFO] Finished at: 2026-09-24T21:34:00-03:00
+[INFO] ------------------------------------------------------------------------

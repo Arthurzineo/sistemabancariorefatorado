@@ -1,0 +1,19 @@
+$ ./mvnw -B test -Dtest=UnicidadeIdentificadorTest -Dsurefire.failIfNoSpecifiedTests=false
+# executado em 2026-09-24 21:35:07
+
+[INFO]   from pom.xml
+[INFO] Compiling 15 source files with javac [debug release 8] to target/classes
+[INFO] Compiling 11 source files with javac [debug release 8] to target/test-classes
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running tdd.UnicidadeIdentificadorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in tdd.UnicidadeIdentificadorTest
+[INFO] Results:
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.026 s
+[INFO] Finished at: 2026-09-24T21:35:09-03:00
+[INFO] ------------------------------------------------------------------------
