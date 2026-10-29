@@ -51,7 +51,7 @@ Detalhes da migração:
 
 | Quem | Papel | O que fazia |
 |---|---|---|
-| **Arthur** (humano) | Dono do produto | Definiu o objetivo, os papéis de cada agente e as decisões de negócio (ex.: manter `float64` como no original, bloquear transferência com conta inativa, 2 containers, evidência de TDD pelos commits). Depois deixou a equipe trabalhar sozinha até o fim. |
+| **Equipe** (humano) | Dono do produto | Definiu o objetivo, os papéis de cada agente e as decisões de negócio (ex.: manter `float64` como no original, bloquear transferência com conta inativa, 2 containers, evidência de TDD pelos commits). Depois deixou a equipe trabalhar sozinha até o fim. |
 | **Claude** (Claude Code) | **Chief** (chefe) | Planejou as fases e tarefas, escreveu os contratos, distribuiu o trabalho e monitorou os agentes. Conferia cada entrega rodando os testes antes de aprovar o merge. |
 | **Codex** | **Worker** (programador) | Escreveu o código seguindo as tarefas, fase por fase, em ciclos TDD; abria um PR por fase. |
 | **Agy** | **Tester-reviewer** | Revisava o código do Codex, rodava e escrevia testes exploratórios num worktree separado e dava parecer. O Codex decidia se aceitava cada observação. |
